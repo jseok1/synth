@@ -1,0 +1,4 @@
+MIDI-to-CV
+GOAL: something that produces notes
+
+start monophonic at first, maybe eventually go polyphonic
