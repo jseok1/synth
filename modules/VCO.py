@@ -3,6 +3,8 @@ import numpy as np
 from modules.LFO import LFO
 
 # it's a graph traversal technically using topological sort
+# round robin for polyphonic synths with N voices
+
 lfo = LFO(44100)
 
 class VCO:
@@ -10,7 +12,7 @@ class VCO:
     def __init__(self, sample_rate) -> None:
         self.sample_rate = sample_rate
         self.config = {
-            'WAVE': 'sine',
+            'WAVE': 'saw',
             # 'FREQ': 16.35 * np.ones(shape=(frame_count,)),  # this can be modulated (LFO) or interpolated (manual change),
             # 'FM': np.ones(shape=(frame_count,)),
             # 'OCT': np.ones(shape=(frame_count))
@@ -28,27 +30,28 @@ class VCO:
     # or keep phase shift <-- preferred.
     def process(self, t, sample_size, voltage):
         frequency = 8.175799 * 2 ** voltage  # C-1 for reference
-        # t = frequency * (np.arange(sample_size) + t) / self.sample_rate
+        t = (np.arange(sample_size) + t) / self.sample_rate
         
 
-        # frequency = A + (B - A) * np.arange(frame_count)
-        t = lfo.process(t, sample_size)
+        # t = lfo.process(t, sample_size)
 
         # frequency = self.config['FREQ']
         if self.config['WAVE'] == 'sine':
-            out_data = np.sin(2 * np.pi * t)
+            out_data = np.sin(2 * np.pi * frequency * t)
         elif self.config['WAVE'] == 'square':
-            out_data = np.sign(np.sin(2 * np.pi * t))
+            out_data = np.sign(np.sin(2 * np.pi * frequency * t))
         elif self.config['WAVE'] == 'triangle':
-            out_data = 2 / np.pi * np.arcsin(np.sin(2 * np.pi * t))
+            out_data = 2 / np.pi * np.arcsin(np.sin(2 * np.pi * frequency * t))
         elif self.config['WAVE'] == 'saw':
-            out_data = 1 / np.pi * np.arctan(np.tan(np.pi * t))
+            out_data = 1 / np.pi * np.arctan(np.tan(np.pi * frequency * t))
 
 
         # out_data *= self.config['V/OCT']
 
         # LFO actually outputs its integral, which can be split up by time, i.e
         # 0 to t_prev + t_prev to t
+        # integral should be a function of this class since you only track
+        # once the patch cable is plugged in
 
 
 

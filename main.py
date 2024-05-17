@@ -3,21 +3,44 @@ import pyaudio
 import pygame
 import time
 
+
 from modules.VCO import VCO
+from modules.VCA import VCA
+from modules.ADSR import ADSR
 from modules.MIDI import MIDI
 
 SAMPLE_RATE = 44100
 
-vco = VCO(SAMPLE_RATE)
+oscillator = VCO(SAMPLE_RATE)
+amplifier = VCA(SAMPLE_RATE)
+envelope = ADSR(SAMPLE_RATE)
+
 midi = MIDI()
 
 voltage = 0
+pressing = False
 
+# with sample rate of 44.1kHz and 576 samples per callback, each invoation of
+# the callback must take < 0.0131s.
 def callback(in_data, frame_count, time_info, status_flags):
+    # t0 = time.time()
+
     global t, voltage
-    out_data = vco.process(t, frame_count, voltage)
+    out_data = oscillator.process(t, frame_count, voltage)
+    env_data = envelope.process(t,
+                                frame_count,
+                                np.ones(frame_count) if pressing else np.zeros(frame_count),
+                                attack=np.ones(frame_count) * 0.1,
+                                decay=np.ones(frame_count) * 0.2,
+                                sustain=np.ones(frame_count) * 0.75,
+                                release=np.ones(frame_count) * 0.2)
+    out_data = amplifier.process(out_data, 0.1 * env_data)
+
     # print(time_info)
     t += frame_count
+
+    # t1 = time.time()
+    # print(t1 - t0)
     return out_data.tobytes(), pyaudio.paContinue
 
 # Initialize PyAudio
@@ -67,8 +90,11 @@ while stream.is_active():
 
     # Check for key pressed
     if event.type == pygame.KEYDOWN and event.key in lookup:
+      pressing = True
       note = lookup[event.key]
       voltage = midi.note_to_cv(note)
+    elif event.type == pygame.KEYUP:
+      pressing = False
       
 
 
