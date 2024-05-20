@@ -8,4 +8,4 @@ class VCA:
 
     def process(self, in_data, level):
         out_data = in_data * level
-        return out_data.astype(np.float32)
+        return out_data

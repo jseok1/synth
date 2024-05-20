@@ -35,6 +35,10 @@ class ADSR:
 
         t = np.zeros((sample_size,))
 
+        # TODO: make continuous (e.g. when ATTACK phase is cut early)
+
+        # gate: [1, 1, 1, 0, 0, 1, 1]
+        #    t: [5, 6, 7, 1, 2, 1, 2]
         groups = np.concatenate(([0], (gate[:-1] != gate[1:]).cumsum()))
         for group in np.unique(groups):
             mask = groups == group
@@ -57,7 +61,7 @@ class ADSR:
         mask = ~gate & (t < release)
         out_data[mask] = self.release(t[mask], sustain[mask], release[mask])
 
-        return out_data.astype(np.float32)
+        return out_data
     
 
 if __name__ == '__main__':
