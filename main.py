@@ -4,104 +4,118 @@ import pygame
 import time
 
 
-from modules.VCO import VCO
-from modules.LFO import LFO
-from modules.VCA import VCA
-from modules.VCF import VCF
-from modules.ADSR import ADSR
+from modules.oscillator import Oscillator
+from modules.modulator import Modulator
+from modules.amplifier import Amplifier
+from modules.filter import Filter
+from modules.envelope import Envelope
 from modules.MIDI import MIDI
+from modules.ARP import ARP
 
-SAMPLE_RATE = 44100
+FREQ_SAMPLE = 44100
+SAMPLE_SIZE = 512
 
-oscillator = VCO(SAMPLE_RATE)
-low_oscillator = LFO(SAMPLE_RATE)
-amplifier = VCA(SAMPLE_RATE)
-envelope = ADSR(SAMPLE_RATE)
-filter = VCF(SAMPLE_RATE)
+pygame.init()
 
-midi = MIDI()
+oscillator = Oscillator(FREQ_SAMPLE, SAMPLE_SIZE)
+modulator = Modulator(FREQ_SAMPLE, SAMPLE_SIZE)
+amplifier = Amplifier(FREQ_SAMPLE, SAMPLE_SIZE)
+envelope = Envelope(FREQ_SAMPLE, SAMPLE_SIZE)
+# filter = Filter(FREQ_SAMPLE, SAMPLE_SIZE)
 
-voltage = 0
+note = 0
 pressing = False
-cutoff = 0.5 # 0-1 but log scale from 20 Hz to 20 kHz
+cutoff = 0.5  # 0-1 but log scale from 20 Hz to 20 kHz
+
+flag = pyaudio.paContinue
+
+
+times = []
 
 # with sample rate of 44.1kHz and 576 samples per callback, each invoation of
 # the callback must take < 0.0131s.
 def callback(in_data, frame_count, time_info, status_flags):
-    t0 = time.time()
+  start = time.time()
 
-    global t, voltage
-    low_data = low_oscillator.process(t, frame_count)
-    out_data = oscillator.process(t, frame_count, voltage, low_data)
-    env_data = envelope.process(t,
-                                frame_count,
-                                np.ones(frame_count) if pressing else np.zeros(frame_count),
-                                attack=np.ones(frame_count) * 0.1,
-                                decay=np.ones(frame_count) * 0.2,
-                                sustain=np.ones(frame_count) * 0.75,
-                                release=np.ones(frame_count) * 0.2)
-    out_data = amplifier.process(out_data, 0.1 * env_data)
-    out_data = filter.process(frame_count, out_data, 20 * 10 ** (3 * cutoff), 5.0)
+  global note, flag
+  # pitch, gate, trigger, velocity = arp.process(frame_count)
 
-    # print(time_info)
-    t += frame_count
+  # low_out_data = modulator.process(t, frame_count)
+  oscillator.set_input('wave', np.ones((SAMPLE_SIZE,)) * 3)
+  oscillator.set_input('freq', np.ones((SAMPLE_SIZE,)) * 8.175799 * 2 ** (note / 12))
+  oscillator.process()
+  out_data = oscillator.get_output('out_data')
 
-    t1 = time.time()
-    # print(t1 - t0)
-    return out_data.astype(np.float32).tobytes(), pyaudio.paContinue
 
-# Initialize PyAudio
-p = pyaudio.PyAudio()
+  # env_data = envelope.process(
+  #   frame_count,
+  #   np.ones(frame_count) if pressing else np.zeros(frame_count),
+  #   attack=np.ones(frame_count) * 1.0,
+  #   decay=np.ones(frame_count) * 1.0,
+  #   sustain=np.ones(frame_count) * 0.75,
+  #   release=np.ones(frame_count) * 1.0,
+  # )
+  # out_data = amplifier.process(
+  #   out_data, np.ones(frame_count) * 0.1
+  # )  # 0.0 * env_data)
+  # out_data = filter.process(
+  #   frame_count,
+  #   out_data,
+  #   20 * 10 ** (2 * cutoff) * np.ones((frame_count,)),
+  #   env_data,
+  #   0.5,
+  # )
 
-stream = p.open(format=pyaudio.paFloat32,
-                channels=1,
-                rate=SAMPLE_RATE,
-                output=True,
-                stream_callback=callback)
+  end = time.time()
+  times.append(end - start)
+  if len(times) == 100:
+    print(np.max(times))
+    times.clear()
 
-t = 0
+  return out_data.astype(np.float32).tobytes(), flag
 
-import pygame
+# y scroll is pitch wheel
+# x scroll is mod wheel
+# pitch wheel is for changing pitch of osc
+# modulation wheel determines how much modulation is applied to the filter cutoff, pitch of osc, and width of pulse
+# glide is time variable TODO: legato
+#
 
-# Initialize pygame
-pygame.init()
-
-# Set the screen dimensions
-screen_width = 800
-screen_height = 600
+screen_width = 100
+screen_height = 100
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 lookup = {
-        pygame.K_z: 48, # C
-        pygame.K_s: 49, # C#
-        pygame.K_x: 50, # D
-        pygame.K_d: 51, # D#
-        pygame.K_c: 52, # E
-        pygame.K_v: 53, # F
-        pygame.K_g: 54, # F#
-        pygame.K_b: 55, # G
-        pygame.K_h: 56, # G#
-        pygame.K_n: 57, # A
-        pygame.K_j: 58, # A#
-        pygame.K_m: 59, # B
-        pygame.K_COMMA: 60, # C
-      }
+  pygame.K_z: 48,  # C
+  pygame.K_s: 49,  # C#
+  pygame.K_x: 50,  # D
+  pygame.K_d: 51,  # D#
+  pygame.K_c: 52,  # E
+  pygame.K_v: 53,  # F
+  pygame.K_g: 54,  # F#
+  pygame.K_b: 55,  # G
+  pygame.K_h: 56,  # G#
+  pygame.K_n: 57,  # A
+  pygame.K_j: 58,  # A#
+  pygame.K_m: 59,  # B
+  pygame.K_COMMA: 60,  # C
+}
 
 lookup = {
-        pygame.K_z: 36, # C
-        pygame.K_s: 37, # C#
-        pygame.K_x: 38, # D
-        pygame.K_d: 39, # D#
-        pygame.K_c: 40, # E
-        pygame.K_v: 41, # F
-        pygame.K_g: 42, # F#
-        pygame.K_b: 43, # G
-        pygame.K_h: 44, # G#
-        pygame.K_n: 45, # A
-        pygame.K_j: 46, # A#
-        pygame.K_m: 47, # B
-        pygame.K_COMMA: 48, # C
-      }
+  pygame.K_z: 36,  # C
+  pygame.K_s: 37,  # C#
+  pygame.K_x: 38,  # D
+  pygame.K_d: 39,  # D#
+  pygame.K_c: 40,  # E
+  pygame.K_v: 41,  # F
+  pygame.K_g: 42,  # F#
+  pygame.K_b: 43,  # G
+  pygame.K_h: 44,  # G#
+  pygame.K_n: 45,  # A
+  pygame.K_j: 46,  # A#
+  pygame.K_m: 47,  # B
+  pygame.K_COMMA: 48,  # C
+}
 
 
 # lookup = {
@@ -120,20 +134,30 @@ lookup = {
 #         pygame.K_COMMA: 36, # C
 #       }
 
+# Initialize PyAudio
+p = pyaudio.PyAudio()
+
+stream = p.open(
+  format=pyaudio.paFloat32,
+  channels=1,
+  rate=FREQ_SAMPLE,
+  frames_per_buffer=SAMPLE_SIZE,
+  output=True,
+  stream_callback=callback,
+)
 
 stream.start_stream()
 
-while stream.is_active():
+while stream.is_active() and flag == pyaudio.paContinue:
   # Handle events
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
-      raise KeyError()
+      flag = pyaudio.paComplete
 
     # Check for key pressed
     if event.type == pygame.KEYDOWN and event.key in lookup:
       pressing = True
       note = lookup[event.key]
-      voltage = midi.note_to_cv(note)
     elif event.type == pygame.KEYUP:
       if not sum(pygame.key.get_pressed()):
         pressing = False
