@@ -31,13 +31,13 @@ class Modulator(Module):
 
     match wave:
       case 'SIN':
-        out_data = np.sin(2 * np.pi * x) + 1
+        out_data = np.sin(2 * np.pi * x)
       case 'SQR':
-        out_data = np.sign(np.sin(2 * np.pi * x)) + 1
+        out_data = np.sign(np.sin(2 * np.pi * x))
       case 'TRI':
-        out_data = 2 / np.pi * np.arcsin(np.sin(2 * np.pi * x)) + 1
+        out_data = 2 / np.pi * np.arcsin(np.sin(2 * np.pi * x))
       case 'SAW':
-        out_data = 2 / np.pi * np.arctan(np.tan(np.pi * x)) + 1
+        out_data = 2 / np.pi * np.arctan(np.tan(np.pi * x))
       case _:
         out_data = np.zeros((self._sample_size,))
 

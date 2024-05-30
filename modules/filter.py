@@ -1,75 +1,70 @@
 import numpy as np
 
+from modules.module import Module
 
-class Filter:
-  def __init__(self, freq_sample, filters=2) -> None:
-    self._freq_sample = freq_sample
-    self._freq_cut_mod_depth = 1.0
-    self._padding = np.zeros((filters + 1, 2))
 
-    self.input = {
-      # 'in_data':,
-      # 'freq_cut':,
-      # 'freq_cut_mod':,
-      # 'freq_cut_mod_depth':,
-      # 'res':,
-      # 'res_mod':,
-      # 'res_mod_depth':,
+class Filter(Module):
+  def __init__(self, freq_sample: float, sample_size: int) -> None:
+    super().__init__(freq_sample, sample_size)
+
+    self._param = {
+      'freq_cut': 2000.0,
+      'freq_cut_mod_depth': 0.5,
+      'res': 0.0,
+      'res_mod_depth': 0.0,
     }
-    self.output = {}
 
-  def _filter(self, sample_size, in_data, in_pad, out_pad, freq_cut, res):
-    in_data = np.concatenate((in_pad, in_data))
-    out_data = np.concatenate((out_pad, np.zeros(sample_size)))
+    self._input = {
+      'freq_cut_mod': np.zeros((sample_size + 2,)),
+      'res_mod': np.zeros((sample_size + 2,)),
+      'in_data': np.zeros((sample_size + 2,)),
+    }
+    self._output = {'out_data': np.zeros((sample_size + 2,))}
 
-    for i in range(sample_size):
+    self._data = np.zeros((sample_size + 2,))
+
+  def _filter(self, in_data, out_data, freq_cut, res):
+    for i in range(2, self._sample_size + 2):
       k = np.tan(np.pi * freq_cut[i] / self._freq_sample)
-      q = 1 / np.sqrt(2) + res
+      q = 1 / np.sqrt(2) + res[i]
       norm = 1 + k / q + k * k
 
-      b = np.array([k * k / norm, 2 * k * k / norm, k * k / norm])
-      a = np.array([1, 2 * (k * k - 1) / norm, (1 - k / q + k * k) / norm])
+      b = np.array([k * k, 2 * k * k, k * k]) / norm
+      a = np.array([2 * (k * k - 1), (1 - k / q + k * k)]) / norm
 
-      out_data[i + 2] = np.dot(in_data[i : i + 3], b[::-1]) - np.dot(
-        out_data[i : i + 2], a[:0:-1]
+      out_data[i] = np.dot(in_data[i - 2 : i + 1], b[::-1]) - np.dot(
+        out_data[i - 2 : i], a[::-1]
       )
 
-    return out_data
+  def process(self) -> None:
+    freq_cut = self._param['freq_cut']
+    freq_cut_mod_depth = self._param['freq_cut_mod_depth']
+    res = self._param['res']
+    res_mod_depth = self._param['res_mod_depth']
 
-  def process(self, sample_size, in_data, freq_cut, freq_cut_mod, res):
+    freq_cut_mod = self._input['freq_cut_mod']
+    res_mod = self._input['res_mod']
+    in_data = self._input['in_data']
+
+    out_data = self._output['out_data']
+    out_data[:2], out_data[2:] = out_data[-2:], 0.0
+
+    self._data[:2], self._data[2:] = self._data[-2:], 0.0
+
+    freq_cut *= 1 + freq_cut_mod_depth * freq_cut_mod
+    res *= np.ones(self._sample_size + 2) # TODO
+
+    self._filter(in_data, self._data, freq_cut, res)
+    self._filter(self._data, out_data, freq_cut, res)
+
+    freq_cut_mod[:2], freq_cut_mod[2:] = freq_cut_mod[-2:], 0.0
+    res_mod[:2], res_mod[2:] = res_mod[-2:], 0.0
+    in_data[:2], in_data[2:] = in_data[-2:], 0.0
+
     # https://stackoverflow.com/questions/20924868/calculate-coefficients-of-2nd-order-butterworth-low-pass-filter
     # 12 or 24 dB/Oct slope? did I normalize right?
     # scale cutoff based on incoming pitch or just set freq?
-    freq_cut *= 1 + self._freq_cut_mod_depth * freq_cut_mod
-
     # divide by sample rate????
-
-    # TODO: normalize freq_cut_mod (and all other modulation params)
-
-    in_pad = self._in_pad
-    out_pad = self._out_pad[0, :]
-    out_data = in_data
-    for i in range(self.filters):
-      out_data = self._filter(
-        sample_size, out_data, in_pad, out_pad, freq_cut, res
-      )
-      in_pad = out_pad
-      out_pad = self._out_pad[i, :]
-
-    in_data = np.concatenate((self._in_pad, in_data))
-    out_1_data_padded = np.concatenate(
-      (self._out_1_pad, np.zeros(sample_size))
-    )
-    out_2_data = np.concatenate((self._out_2_pad, np.zeros(sample_size)))
-
-    self._filter(sample_size, in_data, out_1_data, freq_cut, res)
-    self._filter(sample_size, out_1_data, out_2_data, freq_cut, res)
-
-    self._in_pad = in_data[-2:]
-    self._out_1_pad = out_1_data[-2:]
-    self._out_2_pad = out_2_data[-2:]
-
-    return out_2_data[2:]
 
 
 if __name__ == '__main__':

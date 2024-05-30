@@ -13,11 +13,11 @@ class Module:
     self._input = {}
     self._output = {}
 
-  def set_input(self, input: str, data: np.ndarray):
-    self._input[input][-self._sample_size :] = data
+  def set_input(self, input: str, data: np.ndarray) -> None:
+    self._input[input][-self._sample_size :] = np.copy(data)
 
-  def get_output(self, output: str):
-    return self._output[output][-self._sample_size :][:]
+  def get_output(self, output: str) -> np.ndarray:
+    return np.copy(self._output[output][-self._sample_size :])
 
   def process(self) -> None:
     raise NotImplementedError()

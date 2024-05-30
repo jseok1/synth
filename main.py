@@ -21,10 +21,11 @@ oscillator = Oscillator(FREQ_SAMPLE, SAMPLE_SIZE)
 modulator = Modulator(FREQ_SAMPLE, SAMPLE_SIZE)
 amplifier = Amplifier(FREQ_SAMPLE, SAMPLE_SIZE)
 envelope = Envelope(FREQ_SAMPLE, SAMPLE_SIZE)
-# filter = Filter(FREQ_SAMPLE, SAMPLE_SIZE)
+filter = Filter(FREQ_SAMPLE, SAMPLE_SIZE)
 
 note = 0
-pressing = False
+gate = False
+trigger = False
 cutoff = 0.5  # 0-1 but log scale from 20 Hz to 20 kHz
 
 flag = pyaudio.paContinue
@@ -37,27 +38,36 @@ times = []
 def callback(in_data, frame_count, time_info, status_flags):
   start = time.time()
 
-  global note, flag
+  global note, gate, trigger, flag
   # pitch, gate, trigger, velocity = arp.process(frame_count)
 
   # low_out_data = modulator.process(t, frame_count)
-  oscillator.set_input('wave', np.ones((SAMPLE_SIZE,)) * 3)
-  oscillator.set_input('freq', np.ones((SAMPLE_SIZE,)) * 8.175799 * 2 ** (note / 12))
+  # oscillator.set_input('wave', np.ones((SAMPLE_SIZE,)) * 0)
+  oscillator.set_input('note', np.ones((SAMPLE_SIZE,)) * note)
   oscillator.process()
   out_data = oscillator.get_output('out_data')
 
+  envelope.set_input('gate', np.ones((SAMPLE_SIZE,)) if gate else np.zeros((SAMPLE_SIZE,)))
+  envelope.set_input('trigger', np.array([1] + [0] * (SAMPLE_SIZE - 1)) if trigger else np.zeros((SAMPLE_SIZE,)))
+  envelope.process()
+  env = envelope.get_output('env')
 
-  # env_data = envelope.process(
-  #   frame_count,
-  #   np.ones(frame_count) if pressing else np.zeros(frame_count),
-  #   attack=np.ones(frame_count) * 1.0,
-  #   decay=np.ones(frame_count) * 1.0,
-  #   sustain=np.ones(frame_count) * 0.75,
-  #   release=np.ones(frame_count) * 1.0,
-  # )
-  # out_data = amplifier.process(
-  #   out_data, np.ones(frame_count) * 0.1
-  # )  # 0.0 * env_data)
+  amplifier.set_input('vol_mod', env)
+  amplifier.set_input('in_data', out_data)
+  amplifier.process()
+  out_data = amplifier.get_output('out_data')
+
+  filter._param['freq_cut'] = 20 * 10 ** (2 * cutoff)
+  filter.set_input('freq_cut_mod', env)
+  filter.set_input('in_data', out_data)
+  filter.process()
+  out_data = filter.get_output('out_data')
+
+  trigger = False
+
+
+
+
   # out_data = filter.process(
   #   frame_count,
   #   out_data,
@@ -156,11 +166,12 @@ while stream.is_active() and flag == pyaudio.paContinue:
 
     # Check for key pressed
     if event.type == pygame.KEYDOWN and event.key in lookup:
-      pressing = True
+      gate = True
+      trigger = True
       note = lookup[event.key]
     elif event.type == pygame.KEYUP:
       if not sum(pygame.key.get_pressed()):
-        pressing = False
+        gate = False
     elif event.type == pygame.MOUSEWHEEL:
       if event.y == 1:
         cutoff = min(cutoff + 0.1, 1.0)
