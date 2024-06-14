@@ -1,2 +1,3 @@
 .ruff_cache
 .ruff.toml
+./modules/__pycache__
