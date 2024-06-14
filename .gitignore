@@ -1,3 +1,5 @@
 .ruff_cache
 .ruff.toml
 ./modules/__pycache__
+modules/__pycache__
+venv
