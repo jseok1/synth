@@ -3,6 +3,8 @@ import numpy as np
 from modules.module import Module
 
 
+# TODO: verify ADSR modulation is continuous, change trigger to same as osc
+
 class Envelope(Module):
   _delta: float
 

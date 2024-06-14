@@ -3,6 +3,8 @@ import numpy as np
 from modules.module import Module
 
 
+# TODO: volume linear/log scale?
+
 class Amplifier(Module):
   def __init__(self, freq_sample: float, sample_size: int) -> None:
     super().__init__(freq_sample, sample_size)
