@@ -49,56 +49,59 @@ def callback(in_data, frame_count, time_info, status_flags):
   notes = np.array([lookup[key] for key in keys])
   if False:
     note = lookup[key]
-    oscillator.set_input('note', np.ones((SAMPLE_SIZE,)) * note)
+    oscillator.set_in_channel('note', np.ones((SAMPLE_SIZE,)) * note)
     oscillator.process()
-    out_data = oscillator.get_output('out_data')
+    out_data = oscillator.get_out_channel('out_data')
 
-    envelope.set_input('gate', np.ones((SAMPLE_SIZE,)) if gate else np.zeros((SAMPLE_SIZE,)))
-    envelope.set_input('trigger', np.array([1] + [0] * (SAMPLE_SIZE - 1)) if trigger else np.zeros((SAMPLE_SIZE,)))
+    envelope.set_in_channel('gate', np.ones((SAMPLE_SIZE,)) if gate else np.zeros((SAMPLE_SIZE,)))
+    envelope.set_in_channel('trigger', np.array([1] + [0] * (SAMPLE_SIZE - 1)) if trigger else np.zeros((SAMPLE_SIZE,)))
     envelope.process()
-    env = envelope.get_output('env')
+    env = envelope.get_out_channel('env')
   
   note = np.zeros((SAMPLE_SIZE,))  
   gate = np.zeros((SAMPLE_SIZE,))  
   trigger = np.zeros((SAMPLE_SIZE,))  
 
   if notes.size:
-    arpeggiator._param['notes'] = notes
+    arpeggiator._config['notes'] = notes
     arpeggiator.process()
-    note = arpeggiator.get_output('note')
-    gate = arpeggiator.get_output('gate')
-    trigger = arpeggiator.get_output('trigger')
+    note = arpeggiator.get_out_channel('note')
+    gate = arpeggiator.get_out_channel('gate')
+    trigger = arpeggiator.get_out_channel('trigger')
 
-  oscillator.set_input('note', np.ones((SAMPLE_SIZE,)) * note)
+  oscillator._config['wave'] = 3
+  oscillator._config['freq'] = 8.175799 * 2**2
+  oscillator.set_in_channel('note', np.ones((SAMPLE_SIZE,)) * note)
   oscillator.process()
-  mixer.set_input('in_data_1', oscillator.get_output('out_data'))
+  mixer.set_in_channel('in_data_1', oscillator.get_out_channel('out_data'))
   
 
-  oscillator2._param['wave'] = 1
-  oscillator2._param['freq'] = 8.175799 * 2**4
-  oscillator2.set_input('note', np.ones((SAMPLE_SIZE,)) * note)
+  oscillator2._config['wave'] = 4
+  oscillator2._config['freq'] = 8.175799 * 2**2
+  oscillator2._config['pulse_width'] = 0.8
+  oscillator2.set_in_channel('note', np.ones((SAMPLE_SIZE,)) * note)
   oscillator2.process()
-  mixer.set_input('in_data_1', oscillator2.get_output('out_data'))
+  mixer.set_in_channel('in_data_1', oscillator2.get_out_channel('out_data'))
 
   mixer.process()
-  out_data = mixer.get_output('out_data')
+  out_data = mixer.get_out_channel('out_data')
 
-  envelope.set_input('gate', gate)
-  envelope.set_input('trigger', trigger)
+  envelope.set_in_channel('gate', gate)
+  envelope.set_in_channel('trigger', trigger)
   envelope.process()
-  env = envelope.get_output('env')
+  env = envelope.get_out_channel('env')
 
-  amplifier.set_input('vol_mod', env)
-  amplifier.set_input('in_data', out_data)
+  amplifier.set_in_channel('vol_mod', env)
+  amplifier.set_in_channel('in_data', out_data)
   amplifier.process()
-  out_data = amplifier.get_output('out_data')
+  out_data = amplifier.get_out_channel('out_data')
 
-  filter._param['freq_cut'] = 20 * 10 ** (2 * freq_cut)
-  filter._param['res'] = res
-  filter.set_input('freq_cut_mod', env)
-  filter.set_input('in_data', out_data)
+  filter._config['freq_cut'] = 20 * 10 ** (2 * freq_cut)
+  filter._config['res'] = res
+  filter.set_in_channel('freq_cut_mod', env)
+  filter.set_in_channel('in_data', out_data)
   filter.process()
-  out_data = filter.get_output('out_data')
+  out_data = filter.get_out_channel('out_data')
 
   trigger = False
 

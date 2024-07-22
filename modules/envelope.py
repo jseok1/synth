@@ -1,37 +1,37 @@
 import numpy as np
 
-from modules.module import Module
+from modules.module import AbstractModule
 
 
-# TODO: verify ADSR modulation is continuous, change trigger to same as osc
+# TODO: verify ADSR modulation is continuous, change trig to same as osc
 
-class Envelope(Module):
+
+class EnvelopeModule(AbstractModule):
   _delta: float
 
   def __init__(self, freq_sample: float, sample_size: int) -> None:
     super().__init__(freq_sample, sample_size)
 
-    self._param = {
+    self._params = {
       'att': 0.25,
-      'att_mod_depth': 0.0,
+      'att_mod_amt': 0.0,
       'dec': 0.35,
-      'dec_mod_depth': 0.0,
+      'dec_mod_amt': 0.0,
       'sus': 0.5,
-      'sus_mod_depth': 0.0,
+      'sus_mod_amt': 0.0,
       'rel': 0.5,
-      'rel_mod_depth': 0.0,
+      'rel_mod_amt': 0.0,
     }
-
-    self._input = {
-      'att_mod': np.zeros((sample_size + 1,)),
-      'dec_mod': np.zeros((sample_size + 1,)),
-      'sus_mod': np.zeros((sample_size + 1,)),
-      'rel_mod': np.zeros((sample_size + 1,)),
-      'gate': np.zeros((sample_size + 1,)),
-      'trigger': np.zeros((sample_size + 1,)),
+    self._in_channels = {
+      'in_att_mod': np.zeros((sample_size + 1,)),
+      'in_dec_mod': np.zeros((sample_size + 1,)),
+      'in_sus_mod': np.zeros((sample_size + 1,)),
+      'in_rel_mod': np.zeros((sample_size + 1,)),
+      'in_gate': np.zeros((sample_size + 1,)),
+      'in_trig': np.zeros((sample_size + 1,)),
     }
-    self._output = {
-      'env': np.zeros((sample_size + 1,))  # range is [0, 1]
+    self._out_channels = {
+      'out_env': np.zeros((sample_size + 1,)),  # range is [0, 1]
     }
 
     self._delta = np.inf
@@ -41,7 +41,6 @@ class Envelope(Module):
 
   def _att(self, x: np.ndarray, att: np.ndarray) -> np.ndarray:
     mask = x < att
-
     y = np.zeros_like(x)
     y[mask] = self._ease(np.sqrt, x[mask] / att[mask], 0, 1)
     return y
@@ -50,7 +49,6 @@ class Envelope(Module):
     self, x: np.ndarray, att: np.ndarray, dec: np.ndarray, sus: np.ndarray
   ) -> np.ndarray:
     mask = (att <= x) & (x < att + dec)
-
     y = np.zeros_like(x)
     y[mask] = self._ease(
       np.square,
@@ -64,20 +62,15 @@ class Envelope(Module):
     self, x: np.ndarray, att: np.ndarray, dec: np.ndarray, sus: np.ndarray
   ) -> np.ndarray:
     mask = att + dec <= x
-
     y = np.zeros_like(x)
     y[mask] = sus[mask]
     return y
 
   def _rel(self, x: np.ndarray, sus: np.ndarray, rel: np.ndarray) -> np.ndarray:
     mask = x < rel
-
     y = np.zeros_like(x)
     y[mask] = self._ease(
-      np.square,
-      -sus[mask] / rel[mask] * x[mask] + sus[mask],
-      0,
-      sus[mask],
+      np.square, -sus[mask] / rel[mask] * x[mask] + sus[mask], 0, sus[mask]
     )
     return y
 
@@ -89,64 +82,60 @@ class Envelope(Module):
     x = -rel / sus * self._ease(np.sqrt, y, 0, sus) + rel
     return x
 
+  def _env(self, gate, att, dec, sus, rel) -> np.ndarray:
+    if gate:
+      # TODO: potential optimization
+      out_env[low:high] = (
+        self._att(x[low:high], att[low:high])
+        + self._dec(x[low:high], att[low:high], dec[low:high], sus[low:high])
+        + self._sus(x[low:high], att[low:high], dec[low:high], sus[low:high])
+      )
+    else:
+      out_env[low:high] = self._rel(x[low:high], sus[low:high], rel[low:high])
+
   def process(self) -> None:
-    att = self._param['att']
-    att_mod_depth = self._param['att_mod_depth']
-    dec = self._param['dec']
-    dec_mod_depth = self._param['dec_mod_depth']
-    sus = self._param['sus']
-    sus_mod_depth = self._param['sus_mod_depth']
-    rel = self._param['rel']
-    rel_mod_depth = self._param['rel_mod_depth']
+    att = self._params['att']
+    att_mod_amt = self._params['att_mod_amt']
+    dec = self._params['dec']
+    dec_mod_amt = self._params['dec_mod_amt']
+    sus = self._params['sus']
+    sus_mod_amt = self._params['sus_mod_amt']
+    rel = self._params['rel']
+    rel_mod_amt = self._params['rel_mod_amt']
 
-    att_mod = self._input['att_mod']
-    dec_mod = self._input['dec_mod']
-    sus_mod = self._input['sus_mod']
-    rel_mod = self._input['rel_mod']
-    gate = self._input['gate']
-    trigger = self._input['trigger']
+    in_att_mod = self._in_channels['in_att_mod']
+    in_dec_mod = self._in_channels['in_dec_mod']
+    in_sus_mod = self._in_channels['in_sus_mod']
+    in_rel_mod = self._in_channels['in_rel_mod']
+    in_gate = self._in_channels['in_gate']
+    in_trig = self._in_channels['in_trig']
 
-    env = self._output['env']
-    env[:1], env[1:] = env[-1:], 0.0
+    out_env = self._out_channels['out_env']
 
-    att *= 1 + att_mod * att_mod_depth
-    dec *= 1 + dec_mod * dec_mod_depth
-    sus *= 1 + sus_mod * sus_mod_depth
-    rel *= 1 + rel_mod * rel_mod_depth
+    self._shift_out_channels()
 
-    diff = (gate[:-1] != gate[1:]) | (trigger[1:] > 0)
-    (argdiff,) = np.where(np.concatenate([[False], diff, [True]]))
+    att *= 1 + in_att_mod * att_mod_amt
+    dec *= 1 + in_dec_mod * dec_mod_amt
+    sus *= 1 + in_sus_mod * sus_mod_amt
+    rel *= 1 + in_rel_mod * rel_mod_amt
 
+    diff = (in_gate[:-1] != in_gate[1:]) | (in_trig[:-1] < 0) & (in_trig[1:] >= 0)
+    (argdiff,) = np.where(np.concatenate([diff, [True]]))
+    argdiff += 1
+
+    x = np.zeros((self._sample_size + 1,))
     low = 1
     for i, high in enumerate(argdiff):
+      x[low:high] = np.arange(high - low) / self._freq_sample
       if i == 0:
-        delta = self._delta
+        x[low:high] += self._delta
       else:
-        match gate[low]:
-          case 0:
-            delta = self._rel_delta(env[low - 1], sus[low], rel[low])
-          case 1:
-            delta = self._att_delta(env[low - 1], att[low])
-
-      x = np.arange(high - low) / self._freq_sample + delta
-
-      match gate[low]:
-        case 0:
-          env[low:high] = self._rel(x, sus[low:high], rel[low:high])
-        case 1:
-          env[low:high] = (
-            self._att(x, att[low:high])
-            + self._dec(x, att[low:high], dec[low:high], sus[low:high])
-            + self._sus(x, att[low:high], dec[low:high], sus[low:high])
-          )
-
+        if in_gate[low]:
+          x[low:high] += self._att_delta(out_env[low - 1], att[low])
+        else:
+          x[low:high] += self._rel_delta(out_env[low - 1], sus[low], rel[low])
+      out_env[low:high] = self._env(in_gate[low], att[low:high], dec[low:high], sus[low:high], rel[low:high])
       low = high
 
+    self._shift_in_channels()
     self._delta = x[-1] + 1 / self._freq_sample
-
-    att_mod[:1], att_mod[1:] = att_mod[-1:], 0.0
-    dec_mod[:1], dec_mod[1:] = dec_mod[-1:], 0.0
-    rel_mod[:1], rel_mod[1:] = rel_mod[-1:], 0.0
-    sus_mod[:1], sus_mod[1:] = sus_mod[-1:], 0.0
-    gate[:1], gate[1:] = gate[-1:], 0.0
-    trigger[:1], trigger[1:] = trigger[-1:], 0.0

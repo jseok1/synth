@@ -1,5 +1,7 @@
 .ruff_cache
 .ruff.toml
-./modules/__pycache__
-modules/__pycache__
+.vscode
+__pycache__
+*/__pycache__
+*/build
 venv

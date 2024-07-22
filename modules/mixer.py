@@ -7,7 +7,7 @@ class Mixer(Module):
   def __init__(self, freq_sample: float, sample_size: int) -> None:
     super().__init__(freq_sample, sample_size)
 
-    self._param = {
+    self._config = {
       'vol_1': 0.5,
       'vol_2': 0.5,
     }
@@ -21,8 +21,8 @@ class Mixer(Module):
     self._data = np.zeros((sample_size + 2,))
 
   def process(self) -> None:
-    vol_1 = self._param['vol_1']
-    vol_2 = self._param['vol_2']
+    vol_1 = self._config['vol_1']
+    vol_2 = self._config['vol_2']
 
     in_data_1 = self._input['in_data_1']
     in_data_2 = self._input['in_data_2']

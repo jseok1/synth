@@ -9,7 +9,7 @@ class Amplifier(Module):
   def __init__(self, freq_sample: float, sample_size: int) -> None:
     super().__init__(freq_sample, sample_size)
 
-    self._param = {'vol': 0.1}
+    self._config = {'vol': 0.5}
 
     self._input = {
       'vol_mod': np.ones((sample_size,)),
@@ -18,7 +18,7 @@ class Amplifier(Module):
     self._output = {'out_data': np.zeros((sample_size,))}
 
   def process(self) -> None:
-    vol = self._param['vol']
+    vol = self._config['vol']
 
     vol_mod = self._input['vol_mod']
     in_data = self._input['in_data']

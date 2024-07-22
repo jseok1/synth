@@ -10,7 +10,7 @@ class Arpeggiator(Module):
   def __init__(self, freq_sample: float, sample_size: int) -> None:
     super().__init__(freq_sample, sample_size)
 
-    self._param = {
+    self._config = {
       'notes': np.array([]),
       'direction': 0,
       'duration': 0.25,
@@ -28,11 +28,11 @@ class Arpeggiator(Module):
     self._delta = 0.0
 
   def process(self):
-    notes = self._param['notes']
-    direction = self._param['direction']
-    duration = self._param['duration']
-    glide = self._param['glide']
-    octaves = self._param['octaves']
+    notes = self._config['notes']
+    direction = self._config['direction']
+    duration = self._config['duration']
+    glide = self._config['glide']
+    octaves = self._config['octaves']
 
     note = self._output['note']
     gate = self._output['gate']

@@ -1,0 +1,14 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ObjCBlockIndentWidth: 2
+ContinuationIndentWidth: 2
+ColumnLimit: 80
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent
+IndentCaseLabels: true
+AllowAllParametersOfDeclarationOnNextLine: false
+InsertNewlineAtEOF: true
+AllowShortEnumsOnASingleLine: false
+ConstructorInitializerIndentWidth: 2
+ConstructorInitializerAllOnOneLineOrOnePerLine: true

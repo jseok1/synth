@@ -1,0 +1,65 @@
+For objects...
+1. Return by Value
+
+MyObject createObject() {
+    MyObject obj;
+    // Populate obj
+    return obj;
+}
+
+2. Modify by Reference (but this is mostly archaic due to modern compiler optimizations)
+
+void populateObject(MyObject& obj) {
+    // Populate obj
+}
+
+MyObject obj;
+populateObject(obj);
+
+3. Smart Pointers
+
+std::unique_ptr<MyObject> createObject() {
+    auto obj = std::make_unique<MyObject>();
+    // Populate obj
+    return obj;
+} // for dynamic allocation
+
+
+
+Dynamic allocation is when memory is allocated at runtime. Static allocation is
+when memoery is allocated at compile time.
+
+
+Heap vs. Stack:
+
+Heap: Memory allocated dynamically comes from the heap. The size of the heap is
+usually much larger than the stack, and memory can be allocated and deallocated
+in an arbitrary order.
+Stack: Memory allocated statically or automatically (e.g., local variables)
+comes from the stack. The stack is smaller and follows a Last In, First Out
+(LIFO) order, which makes it faster but less flexible.
+
+Use "new" and "delete" for dynamic allocation.
+
+Rules:
+1. Use static allocation whenever possible.
+2. If dynamic allocation is needed, use smart pointers instead of "new" and
+"delete".
+3. Returning by reference (as opposed to modifying by reference) is usually
+unnecessary.
+
+In C++, arguments are passed by value and returned by value by default.
+Compilers normally perform return value optimization so returning by value is as
+performant as returning by reference. The idiomatic sage way to return by
+reference is to pass a named reference as an argument. BUT ALWAYS RETURN BY VALUE.
+
+~ Don't use C-style pointers (unless you need to reference NULL or modify what
+you're referencing), don't use C-style arrays.
+
+
+
+const
+pointers vs references
+when to allocate on heap
+
+
