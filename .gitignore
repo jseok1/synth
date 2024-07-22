@@ -1,7 +1,3 @@
-.ruff_cache
-.ruff.toml
+.ignore
 .vscode
-__pycache__
-*/__pycache__
-*/build
-venv
+build
