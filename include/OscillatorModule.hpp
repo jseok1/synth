@@ -31,6 +31,7 @@ class OscillatorModule : public AbstractModule {
   std::unordered_map<OscillatorOutPort, double> out_ports;
 
   OscillatorModule(double freq_sample);
+  
   void process() override;
 
  private:

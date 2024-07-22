@@ -5,6 +5,7 @@ class AbstractModule {
  public:
   AbstractModule(double freq_sample);
   virtual ~AbstractModule();
+  
   virtual void process() = 0;
 
  protected:

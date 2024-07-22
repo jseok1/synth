@@ -33,6 +33,7 @@ class EnvelopeModule : public AbstractModule {
   std::unordered_map<EnvelopeOutPort, double> out_ports;
 
   EnvelopeModule(double freq_sample);
+  
   void process() override;
 
  private:

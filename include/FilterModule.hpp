@@ -26,6 +26,7 @@ class FilterModule : public AbstractModule {
   std::unordered_map<FilterOutPort, double> out_ports;
 
   FilterModule(double freq_sample);
+  
   void process() override;
 
  private:
@@ -33,9 +34,9 @@ class FilterModule : public AbstractModule {
   double in_tm1;
   double out_tm2;
   double out_tm1;
-  double tmp_tm2;
-  double tmp_tm1;
-  double tmp_t;
+  double buf_tm2;
+  double buf_tm1;
+  double buf_t;
 
   static double filter(
     double in_tm2,

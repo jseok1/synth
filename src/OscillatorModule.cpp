@@ -46,7 +46,7 @@ void OscillatorModule::process() {
   freq_t *= std::pow(2, volt_per_oct_t / 12) * (1 + freq_mod_t * freq_mod_amt_t);
   pul_width_t *= 1 + pul_width_mod_t * pul_width_mod_amt_t;
 
-  freq_t = std::clamp(freq_t, 8.176, 12543.855);
+  freq_t = std::clamp(freq_t, 0.0, freq_sample / 2);
   pul_width_t = std::clamp(pul_width_t, 0.01, 0.99);
 
   double phase_t = std::fmod(phase_tm1 + freq_t / freq_sample, 1);

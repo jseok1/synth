@@ -20,7 +20,8 @@ class MixerModule : public AbstractModule {
   std::array<double, 2> in_ports;
   std::array<double, 1> out_ports;
 
-  MixerModule(double freq_sample) ;
+  MixerModule(double freq_sample);
+
   void process() override;
 };
 
