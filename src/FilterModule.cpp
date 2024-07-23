@@ -5,24 +5,24 @@
 FilterModule::FilterModule(double freq_sample)
   : AbstractModule{freq_sample},
     params{
-      {FilterParam::freq_cut_t, 0},
-      {FilterParam::freq_cut_mod_amt_t, 0},
-      {FilterParam::res_t, 0},
-      {FilterParam::res_mod_amt_t, 0}
+      {FilterParam::freq_cut_t, 0.0},
+      {FilterParam::freq_cut_mod_amt_t, 0.0},
+      {FilterParam::res_t, 0.0},
+      {FilterParam::res_mod_amt_t, 0.0}
     },
     in_ports{
-      {FilterInPort::freq_cut_mod_t, 0},
-      {FilterInPort::res_mod_t, 0},
-      {FilterInPort::in_t, 0}
+      {FilterInPort::freq_cut_mod_t, 0.0},
+      {FilterInPort::res_mod_t, 0.0},
+      {FilterInPort::in_t, 0.0}
     },
-    out_ports{{FilterOutPort::out_t, 0}},
-    in_tm2{0},
-    in_tm1{0},
-    out_tm2{0},
-    out_tm1{0},
-    hidden_tm2{0},
-    hidden_tm1{0},
-    hidden_t{0} {}
+    out_ports{{FilterOutPort::out_t, 0.0}},
+    in_tm2{0.0},
+    in_tm1{0.0},
+    out_tm2{0.0},
+    out_tm1{0.0},
+    hidden_tm2{0.0},
+    hidden_tm1{0.0},
+    hidden_t{0.0} {}
 
 void FilterModule::process() {
   auto freq_cut_t = params[FilterParam::freq_cut_t];
@@ -50,7 +50,7 @@ void FilterModule::process() {
   freq_cut_t = std::tan(M_PI * freq_cut_t / freq_sample);
 
   double qual_t;
-  
+
   qual_t = 1 / (2 * std::cos(M_PI / 8 * (1 + res_t / 3)));
   hidden_t = filter(in_tm2, in_tm1, in_t, hidden_tm2, hidden_tm1, freq_cut_t, qual_t);
 
@@ -72,14 +72,13 @@ double FilterModule::filter(
 ) {
   double freq_cut_sqr_t = freq_cut_t * freq_cut_t;
 
-  // TODO: not a great hack
-  double out_t = (                                                         //
-                   freq_cut_sqr_t * in_tm2 +                               //
-                   2 * freq_cut_sqr_t * in_tm1 +                           //
-                   freq_cut_sqr_t * in_t -                                 //
-                   (1 - freq_cut_t / qual_t + freq_cut_sqr_t) * out_tm2 -  //
-                   (2 * freq_cut_sqr_t - 2) * out_tm1                      //
-                 ) /
-                 (1 + freq_cut_t / qual_t + freq_cut_sqr_t);
+  double out_t = 0.0;
+  out_t += freq_cut_sqr_t * in_tm2;
+  out_t += 2 * freq_cut_sqr_t * in_tm1;
+  out_t += freq_cut_sqr_t * in_t;
+  out_t -= (1 - freq_cut_t / qual_t + freq_cut_sqr_t) * out_tm2;
+  out_t -= (2 * freq_cut_sqr_t - 2) * out_tm1;
+  out_t /= (1 + freq_cut_t / qual_t + freq_cut_sqr_t);
+
   return out_t;
 }

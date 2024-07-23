@@ -6,29 +6,29 @@
 EnvelopeModule::EnvelopeModule(double freq_sample)
   : AbstractModule{freq_sample},
     params{
-      {EnvelopeParam::att_t, 0},
-      {EnvelopeParam::att_mod_amt_t, 0},
-      {EnvelopeParam::dec_t, 0},
-      {EnvelopeParam::dec_mod_amt_t, 0},
-      {EnvelopeParam::sus_t, 0},
-      {EnvelopeParam::sus_mod_amt_t, 0},
-      {EnvelopeParam::rel_t, 0},
-      {EnvelopeParam::rel_mod_amt_t, 0}
+      {EnvelopeParam::att_t, 0.0},
+      {EnvelopeParam::att_mod_amt_t, 0.0},
+      {EnvelopeParam::dec_t, 0.0},
+      {EnvelopeParam::dec_mod_amt_t, 0.0},
+      {EnvelopeParam::sus_t, 0.0},
+      {EnvelopeParam::sus_mod_amt_t, 0.0},
+      {EnvelopeParam::rel_t, 0.0},
+      {EnvelopeParam::rel_mod_amt_t, 0.0}
     },
     in_ports{
-      {EnvelopeInPort::att_mod_t, 0},
-      {EnvelopeInPort::dec_mod_t, 0},
-      {EnvelopeInPort::sus_mod_t, 0},
-      {EnvelopeInPort::rel_mod_t, 0},
-      {EnvelopeInPort::gate_t, 0},
-      {EnvelopeInPort::retr_t, 0}
+      {EnvelopeInPort::att_mod_t, 0.0},
+      {EnvelopeInPort::dec_mod_t, 0.0},
+      {EnvelopeInPort::sus_mod_t, 0.0},
+      {EnvelopeInPort::rel_mod_t, 0.0},
+      {EnvelopeInPort::gate_t, 0.0},
+      {EnvelopeInPort::retr_t, 0.0}
     },
-    out_ports{{EnvelopeOutPort::env_t, 0}},
+    out_ports{{EnvelopeOutPort::env_t, 0.0}},
     stage_tm1{EnvelopeStage::idl},
-    sus_tm1{0},
-    gate_tm1{0},
-    retr_tm1{0},
-    env_tm1{0} {}
+    sus_tm1{0.0},
+    gate_tm1{0.0},
+    retr_tm1{0.0},
+    env_tm1{0.0} {}
 
 void EnvelopeModule::process() {
   auto att_t = params[EnvelopeParam::att_t];
@@ -132,11 +132,11 @@ double EnvelopeModule::env(
       );
       break;
     case EnvelopeStage::idl:
-      env_t = 0;
+      env_t = 0.0;
       break;
     default:
       throw std::invalid_argument("EnvelopeStage is invalid.");
   }
-  
+
   return env_t;
 }

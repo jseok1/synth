@@ -5,26 +5,26 @@
 OscillatorModule::OscillatorModule(double freq_sample)
   : AbstractModule{freq_sample},
     params{
-      {OscillatorParam::freq_t, 0},
-      {OscillatorParam::freq_mod_amt_t, 0},
-      {OscillatorParam::pul_width_t, 0},
-      {OscillatorParam::pul_width_mod_amt_t, 0}
+      {OscillatorParam::freq_t, 0.0},
+      {OscillatorParam::freq_mod_amt_t, 0.0},
+      {OscillatorParam::pul_width_t, 0.0},
+      {OscillatorParam::pul_width_mod_amt_t, 0.0}
     },
     in_ports{
-      {OscillatorInPort::freq_mod_t, 0},
-      {OscillatorInPort::pul_width_mod_t, 0},
-      {OscillatorInPort::volt_per_oct_t, 0},
-      {OscillatorInPort::sync_t, 0}
+      {OscillatorInPort::freq_mod_t, 0.0},
+      {OscillatorInPort::pul_width_mod_t, 0.0},
+      {OscillatorInPort::volt_per_oct_t, 0.0},
+      {OscillatorInPort::sync_t, 0.0}
     },
     out_ports{
-      {OscillatorOutPort::sin_t, 0},
-      {OscillatorOutPort::tri_t, 0},
-      {OscillatorOutPort::saw_t, 0},
-      {OscillatorOutPort::sqr_t, 0},
-      {OscillatorOutPort::pul_t, 0}
+      {OscillatorOutPort::sin_t, 0.0},
+      {OscillatorOutPort::tri_t, 0.0},
+      {OscillatorOutPort::saw_t, 0.0},
+      {OscillatorOutPort::sqr_t, 0.0},
+      {OscillatorOutPort::pul_t, 0.0}
     },
-    phase_tm1{0},
-    sync_tm1{0} {}
+    phase_tm1{0.0},
+    sync_tm1{0.0} {}
 
 void OscillatorModule::process() {
   auto freq_t = params[OscillatorParam::freq_t];
@@ -52,7 +52,7 @@ void OscillatorModule::process() {
   double phase_t = std::fmod(phase_tm1 + freq_t / freq_sample, 1);
 
   if (sync_tm1 < 0 && sync_t >= 0) {
-    phase_t = 0;
+    phase_t = 0.0;
   }
 
   sin_t = sin(phase_t);
@@ -89,13 +89,13 @@ double OscillatorModule::saw(double phase_t) {
 double OscillatorModule::sqr(double phase_t) {
   phase_t = std::fmod(phase_t, 1);
 
-  double sqr_t = phase_t < 0.5 ? 1 : -1;
+  double sqr_t = phase_t < 0.5 ? 1.0 : -1.0;
   return sqr_t;
 }
 
 double OscillatorModule::pul(double phase_t, double pul_width_t) {
   phase_t = std::fmod(phase_t, 1);
   
-  double pul_t = phase_t < pul_width_t ? 1 : -1;
+  double pul_t = phase_t < pul_width_t ? 1.0 : -1.0;
   return pul_t;
 }

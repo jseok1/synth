@@ -8,8 +8,8 @@ void MixerModule::process() {
 
   double &out_t = out_ports[OUT_T];
 
-  double gain = 1.f;  // initial level?
-  gain /= 2.f;        // divide by number of ports
+  double gain = 1.0;  // initial level?
+  gain /= 2;        // divide by number of ports
 
   // interesting consideration -- this module needs to know whether there's
   // actually a signal connected
