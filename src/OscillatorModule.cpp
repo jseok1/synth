@@ -66,26 +66,36 @@ void OscillatorModule::process() {
 }
 
 double OscillatorModule::sin(double phase_t) {
-  return std::sin(2 * M_PI * phase_t);
+  double sin_t = std::sin(2 * M_PI * phase_t);
+  return sin_t;
 }
 
 double OscillatorModule::tri(double phase_t) {
   phase_t = std::fmod(phase_t, 1);
-  return phase_t < 0.25 ? 4 * phase_t
-                        : (phase_t < 0.75 ? 2 - 4 * phase_t : 4 * phase_t - 4);
+
+  double tri_t = phase_t < 0.25
+                   ? 4 * phase_t
+                   : (phase_t < 0.75 ? 2 - 4 * phase_t : 4 * phase_t - 4);
+  return tri_t;
 }
 
 double OscillatorModule::saw(double phase_t) {
   phase_t = std::fmod(phase_t, 1);
-  return 2 * phase_t - 1;
+
+  double saw_t = 2 * phase_t - 1;
+  return saw_t;
 }
 
 double OscillatorModule::sqr(double phase_t) {
   phase_t = std::fmod(phase_t, 1);
-  return phase_t < 0.5 ? 1 : -1;
+
+  double sqr_t = phase_t < 0.5 ? 1 : -1;
+  return sqr_t;
 }
 
 double OscillatorModule::pul(double phase_t, double pul_width_t) {
   phase_t = std::fmod(phase_t, 1);
-  return phase_t < pul_width_t ? 1 : -1;
+  
+  double pul_t = phase_t < pul_width_t ? 1 : -1;
+  return pul_t;
 }

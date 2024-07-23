@@ -105,30 +105,38 @@ double EnvelopeModule::env(
   double sus_t,
   double rel_t
 ) {
+  double env_t;
   switch (stage_t) {
     case EnvelopeStage::att:
       double att_target_t = 1.2;
       double att_rate_t = std::log((att_target_t - 1) / att_target_t) / att_t;
-      return std::min(
+      env_t = std::min(
         (env_tm1 - att_target_t) * std::exp(att_rate_t) + att_target_t, 1.0
       );
+      break;
     case EnvelopeStage::dec:
       double dec_target_t = sus_t - 0.001;
       double dec_rate_t = -std::log((dec_target_t - 1) / dec_target_t) / dec_t;
-      return std::max(
+      env_t = std::max(
         (env_tm1 - dec_target_t) * std::exp(dec_rate_t) + dec_target_t, sus_t
       );
+      break;
     case EnvelopeStage::sus:
-      return sus_t;
+      env_t = sus_t;
+      break;
     case EnvelopeStage::rel:
       double rel_target_t = -0.001;
       double rel_rate_t = -std::log((rel_target_t - 1) / rel_target_t) / rel_t;
-      return std::max(
+      env_t = std::max(
         (env_tm1 - rel_target_t) * std::exp(rel_rate_t) + rel_target_t, 0.0
       );
+      break;
     case EnvelopeStage::idl:
-      return 0;
+      env_t = 0;
+      break;
     default:
       throw std::invalid_argument("EnvelopeStage is invalid.");
   }
+  
+  return env_t;
 }
