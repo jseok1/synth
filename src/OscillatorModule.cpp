@@ -3,7 +3,7 @@
 #include <cmath>
 
 OscillatorModule::OscillatorModule(double freq_sample)
-  : AbstractModule{freq_sample},
+  : Module{freq_sample},
     params{
       {OscillatorParam::freq_t, 0.0},
       {OscillatorParam::freq_mod_amt_t, 0.0},

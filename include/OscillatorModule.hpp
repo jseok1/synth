@@ -1,10 +1,10 @@
 #ifndef OSCILLATOR_MODULE_HPP
 #define OSCILLATOR_MODULE_HPP
 
-#include <AbstractModule.hpp>
+#include <Module.hpp>
 #include <unordered_map>
 
-class OscillatorModule : public AbstractModule {
+class OscillatorModule : public Module {
  public:
   enum class OscillatorParam {
     freq_t,

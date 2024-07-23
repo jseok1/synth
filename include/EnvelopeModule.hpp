@@ -1,10 +1,10 @@
 #ifndef ENVELOPE_MODULE_HPP
 #define ENVELOPE_MODULE_HPP
 
-#include <AbstractModule.hpp>
+#include <Module.hpp>
 #include <unordered_map>
 
-class EnvelopeModule : public AbstractModule {
+class EnvelopeModule : public Module {
  public:
   enum class EnvelopeParam {
     att_t,

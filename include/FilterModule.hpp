@@ -1,10 +1,10 @@
 #ifndef FILTER_MODULE_HPP
 #define FILTER_MODULE_HPP
 
-#include <AbstractModule.hpp>
+#include <Module.hpp>
 #include <unordered_map>
 
-class FilterModule : public AbstractModule {
+class FilterModule : public Module {
  public:
   enum class FilterParam {
     freq_cut_t,

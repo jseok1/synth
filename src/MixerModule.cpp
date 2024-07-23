@@ -1,6 +1,6 @@
 #include <MixerModule.hpp>
 
-MixerModule::MixerModule(double freq_sample) : AbstractModule{freq_sample} {}
+MixerModule::MixerModule(double freq_sample) : Module{freq_sample} {}
 
 void MixerModule::process() {
   double in_1_t = in_ports[IN_1_T];

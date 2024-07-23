@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 EnvelopeModule::EnvelopeModule(double freq_sample)
-  : AbstractModule{freq_sample},
+  : Module{freq_sample},
     params{
       {EnvelopeParam::att_t, 0.0},
       {EnvelopeParam::att_mod_amt_t, 0.0},

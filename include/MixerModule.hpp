@@ -1,10 +1,10 @@
 #ifndef MIXER_MODULE_HPP
 #define MIXER_MODULE_HPP
 
-#include <AbstractModule.hpp>
+#include <Module.hpp>
 #include <array>
 
-class MixerModule : public AbstractModule {
+class MixerModule : public Module {
  public:
   enum MixerParam {
   };

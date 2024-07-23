@@ -3,7 +3,7 @@
 #include <cmath>
 
 FilterModule::FilterModule(double freq_sample)
-  : AbstractModule{freq_sample},
+  : Module{freq_sample},
     params{
       {FilterParam::freq_cut_t, 0.0},
       {FilterParam::freq_cut_mod_amt_t, 0.0},
