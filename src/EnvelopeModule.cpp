@@ -1,4 +1,5 @@
-#include <EnvelopeModule.hpp>
+#include "EnvelopeModule.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
@@ -23,7 +24,9 @@ EnvelopeModule::EnvelopeModule(double freq_sample)
       {EnvelopeInPort::gate_t, 0.0},
       {EnvelopeInPort::retr_t, 0.0}
     },
-    out_ports{{EnvelopeOutPort::env_t, 0.0}},
+    out_ports{
+      {EnvelopeOutPort::env_t, 0.0}
+    },
     stage_tm1{EnvelopeStage::idl},
     sus_tm1{0.0},
     gate_tm1{0.0},
@@ -51,10 +54,10 @@ void EnvelopeModule::process() {
 
   env_tm1 = env_t;
 
-  att_t *= 1 + att_mod_t * att_mod_amt_t;
-  dec_t *= 1 + dec_mod_t * dec_mod_amt_t;
-  sus_t *= 1 + sus_mod_t * sus_mod_amt_t;
-  rel_t *= 1 + rel_mod_t * rel_mod_amt_t;
+  att_t += att_mod_t * att_mod_amt_t;
+  dec_t += dec_mod_t * dec_mod_amt_t;
+  sus_t += sus_mod_t * sus_mod_amt_t;
+  rel_t += rel_mod_t * rel_mod_amt_t;
 
   att_t = std::clamp(att_t, 0.0, 1.0) * freq_sample * 10;
   dec_t = std::clamp(dec_t, 0.0, 1.0) * freq_sample * 10;

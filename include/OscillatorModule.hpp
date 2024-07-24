@@ -1,8 +1,9 @@
 #ifndef OSCILLATOR_MODULE_HPP
 #define OSCILLATOR_MODULE_HPP
 
-#include <Module.hpp>
 #include <unordered_map>
+
+#include "Module.hpp"
 
 class OscillatorModule : public Module {
  public:
@@ -15,7 +16,7 @@ class OscillatorModule : public Module {
   enum class OscillatorInPort {
     freq_mod_t,
     pul_width_mod_t,
-    volt_per_oct_t,
+    oct_t,
     sync_t
   };
   enum class OscillatorOutPort {
@@ -31,7 +32,7 @@ class OscillatorModule : public Module {
   std::unordered_map<OscillatorOutPort, double> out_ports;
 
   OscillatorModule(double freq_sample);
-  
+
   void process() override;
 
  private:

@@ -1,24 +1,29 @@
 #ifndef MIXER_MODULE_HPP
 #define MIXER_MODULE_HPP
 
-#include <Module.hpp>
-#include <array>
+#include <unordered_map>
+
+#include "Module.hpp"
 
 class MixerModule : public Module {
  public:
-  enum MixerParam {
-  };
-  enum MixerInPort {
+  enum class MixerParam {};
+  enum class MixerInPort {
     in_1_t,
-    in_2_t
+    in_2_t,
+    in_3_t,
+    in_4_t
   };
-  enum MixerOutPort {
+  enum class MixerOutPort {
     out_t
   };
 
-  std::array<double, 0> params;
-  std::array<double, 2> in_ports;
-  std::array<double, 1> out_ports;
+
+  // normalize??
+
+  std::unordered_map<MixerParam, double> params;
+  std::unordered_map<MixerInPort, double> in_ports;
+  std::unordered_map<MixerOutPort, double> out_ports;
 
   MixerModule(double freq_sample);
 

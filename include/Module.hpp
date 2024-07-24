@@ -5,7 +5,7 @@ class Module {
  public:
   Module(double freq_sample);
   virtual ~Module();
-  
+
   virtual void process() = 0;
 
  protected:

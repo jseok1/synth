@@ -1,8 +1,9 @@
 #ifndef ENVELOPE_MODULE_HPP
 #define ENVELOPE_MODULE_HPP
 
-#include <Module.hpp>
 #include <unordered_map>
+
+#include "Module.hpp"
 
 class EnvelopeModule : public Module {
  public:
@@ -33,7 +34,7 @@ class EnvelopeModule : public Module {
   std::unordered_map<EnvelopeOutPort, double> out_ports;
 
   EnvelopeModule(double freq_sample);
-  
+
   void process() override;
 
  private:

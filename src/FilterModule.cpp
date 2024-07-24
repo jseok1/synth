@@ -1,11 +1,12 @@
-#include <FilterModule.hpp>
+#include "FilterModule.hpp"
+
 #include <algorithm>
 #include <cmath>
 
 FilterModule::FilterModule(double freq_sample)
   : Module{freq_sample},
     params{
-      {FilterParam::freq_cut_t, 0.0},
+      {FilterParam::freq_cut_t, 20.0},
       {FilterParam::freq_cut_mod_amt_t, 0.0},
       {FilterParam::res_t, 0.0},
       {FilterParam::res_mod_amt_t, 0.0}
@@ -15,7 +16,9 @@ FilterModule::FilterModule(double freq_sample)
       {FilterInPort::res_mod_t, 0.0},
       {FilterInPort::in_t, 0.0}
     },
-    out_ports{{FilterOutPort::out_t, 0.0}},
+    out_ports{
+      {FilterOutPort::out_t, 0.0}
+    },
     in_tm2{0.0},
     in_tm1{0.0},
     out_tm2{0.0},
@@ -41,8 +44,8 @@ void FilterModule::process() {
   hidden_tm2 = hidden_tm1;
   hidden_tm1 = hidden_t;
 
-  freq_cut_t *= 1 + freq_cut_mod_t * freq_cut_mod_amt_t;
-  res_t *= 1 + res_mod_t * res_mod_t;
+  freq_cut_t *= std::pow(2, freq_cut_mod_t * freq_cut_mod_amt_t);
+  res_t += res_mod_t * res_mod_t;
 
   freq_cut_t = std::clamp(freq_cut_t, 0.0, freq_sample / 2);
   res_t = std::clamp(res_t, 0.0, 0.99);
@@ -82,3 +85,6 @@ double FilterModule::filter(
 
   return out_t;
 }
+
+// TODO: make order of filter a param? and see how you can generalize?
+// cascades

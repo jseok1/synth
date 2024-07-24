@@ -1,11 +1,12 @@
-#include <OscillatorModule.hpp>
+#include "OscillatorModule.hpp"
+
 #include <algorithm>
 #include <cmath>
 
 OscillatorModule::OscillatorModule(double freq_sample)
   : Module{freq_sample},
     params{
-      {OscillatorParam::freq_t, 0.0},
+      {OscillatorParam::freq_t, 8.175799 * std::pow(2, 2)},  // 32': 2, 16': 3, 8': 4, 4': 5, 2': 6
       {OscillatorParam::freq_mod_amt_t, 0.0},
       {OscillatorParam::pul_width_t, 0.0},
       {OscillatorParam::pul_width_mod_amt_t, 0.0}
@@ -13,7 +14,7 @@ OscillatorModule::OscillatorModule(double freq_sample)
     in_ports{
       {OscillatorInPort::freq_mod_t, 0.0},
       {OscillatorInPort::pul_width_mod_t, 0.0},
-      {OscillatorInPort::volt_per_oct_t, 0.0},
+      {OscillatorInPort::oct_t, 0.0},
       {OscillatorInPort::sync_t, 0.0}
     },
     out_ports{
@@ -34,7 +35,7 @@ void OscillatorModule::process() {
 
   auto freq_mod_t = in_ports[OscillatorInPort::freq_mod_t];
   auto pul_width_mod_t = in_ports[OscillatorInPort::pul_width_mod_t];
-  auto volt_per_oct_t = in_ports[OscillatorInPort::volt_per_oct_t];
+  auto oct_t = in_ports[OscillatorInPort::oct_t];
   auto sync_t = in_ports[OscillatorInPort::sync_t];
 
   auto &sin_t = out_ports[OscillatorOutPort::sin_t];
@@ -43,8 +44,8 @@ void OscillatorModule::process() {
   auto &sqr_t = out_ports[OscillatorOutPort::sqr_t];
   auto &pul_t = out_ports[OscillatorOutPort::pul_t];
 
-  freq_t *= std::pow(2, volt_per_oct_t / 12) * (1 + freq_mod_t * freq_mod_amt_t);
-  pul_width_t *= 1 + pul_width_mod_t * pul_width_mod_amt_t;
+  freq_t *= std::pow(2, oct_t + freq_mod_t * freq_mod_amt_t);
+  pul_width_t += pul_width_mod_t * pul_width_mod_amt_t;
 
   freq_t = std::clamp(freq_t, 0.0, freq_sample / 2);
   pul_width_t = std::clamp(pul_width_t, 0.01, 0.99);
@@ -95,7 +96,7 @@ double OscillatorModule::sqr(double phase_t) {
 
 double OscillatorModule::pul(double phase_t, double pul_width_t) {
   phase_t = std::fmod(phase_t, 1);
-  
+
   double pul_t = phase_t < pul_width_t ? 1.0 : -1.0;
   return pul_t;
 }
