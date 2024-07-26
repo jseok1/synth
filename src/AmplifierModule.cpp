@@ -8,7 +8,7 @@ AmplifierModule::AmplifierModule(double freq_sample)
       {AmplifierParam::amp_mod_amt_t, 1.0}
     },
     in_ports{
-      {AmplifierInPort::amp_mod_t, 0.0},
+      {AmplifierInPort::amp_mod_t, 1.0},
       {AmplifierInPort::in_t, 0.0}
     },
     out_ports{

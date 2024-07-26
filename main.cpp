@@ -9,7 +9,6 @@
 
 #define FREQ_SAMPLE 44100
 #define SAMPLE_SIZE 256
-#define FREQUENCY 440.0
 
 using namespace std;
 
@@ -41,34 +40,36 @@ static int process(
   float *out = (float *)outputBuffer;
 
   for (unsigned long i = 0; i < SAMPLE_SIZE; i++) {
-    data->oscillator1->params[OscillatorModule::FREQ_T] = 440.0;
-    data->oscillator1->params[OscillatorModule::FREQ_MOD_AMT_T] = 0.0;
-    data->oscillator1->params[OscillatorModule::PUL_WIDTH_T] = 0.5;
-    data->oscillator1->params[OscillatorModule::PUL_WIDTH_MOD_AMT_T] = 0.0;
-    data->oscillator1->ports_in[OscillatorModule::VOLT_PER_OCT_T] = 0.0;
-    data->oscillator1->ports_in[OscillatorModule::SYNC_T] = 0.0;
+    data->oscillator1->params[OscillatorModule::OscillatorParam::freq_t] = 440.0;
+    data->oscillator1->params[OscillatorModule::OscillatorParam::freq_mod_amt_t] = 0.0;
+    data->oscillator1->params[OscillatorModule::OscillatorParam::pul_width_t] = 0.5;
+    data->oscillator1->params[OscillatorModule::OscillatorParam::pul_width_mod_amt_t] = 0.0;
+    data->oscillator1->in_ports[OscillatorModule::OscillatorInPort::oct_t] = 0.0;
+    data->oscillator1->in_ports[OscillatorModule::OscillatorInPort::sync_t] = 0.0;
     data->oscillator1->process();
+    
+    *out++ = data->oscillator1->out_ports[OscillatorModule::OscillatorOutPort::sqr_t];
 
-    data->oscillator2->params[OscillatorModule::FREQ_T] = 320.0;
-    data->oscillator2->params[OscillatorModule::FREQ_MOD_AMT_T] = 0.0;
-    data->oscillator2->params[OscillatorModule::PUL_WIDTH_T] = 0.5;
-    data->oscillator2->params[OscillatorModule::PUL_WIDTH_MOD_AMT_T] = 0.0;
-    data->oscillator2->ports_in[OscillatorModule::VOLT_PER_OCT_T] = 0.0;
-    data->oscillator2->ports_in[OscillatorModule::SYNC_T] = data->oscillator1->ports_out[OscillatorModule::SQR_T];
-    data->oscillator2->process();
+    // data->oscillator2->params[OscillatorModule::OscillatorParam::freq_t] = 320.0;
+    // data->oscillator2->params[OscillatorModule::OscillatorParam::freq_mod_amt_t] = 0.0;
+    // data->oscillator2->params[OscillatorModule::OscillatorParam::pul_width_t] = 0.5;
+    // data->oscillator2->params[OscillatorModule::OscillatorParam::pul_width_mod_amt_t] = 0.0;
+    // data->oscillator2->in_ports[OscillatorModule::OscillatorInPort::oct_t] = 0.0;
+    // data->oscillator2->in_ports[OscillatorModule::OscillatorInPort::sync_t] = data->oscillator1->out_ports[OscillatorModule::OscillatorOutPort::sqr_t];
+    // data->oscillator2->process();
 
-    data->mixer->ports_in[MixerModule::IN_1_T] = data->oscillator1->ports_out[OscillatorModule::SQR_T];
-    data->mixer->ports_in[MixerModule::IN_2_T] = data->oscillator2->ports_out[OscillatorModule::SAW_T];
-    data->mixer->process();
+    // data->mixer->in_ports[MixerModule::MixerInPort::] = data->oscillator1->out_ports[OscillatorModule::SQR_T];
+    // data->mixer->in_ports[MixerModule::IN_2_T] = data->oscillator2->out_ports[OscillatorModule::SAW_T];
+    // data->mixer->process();
 
-    data->filter->params[FilterModule::FREQ_CUT_T] = 1000.0;
-    data->filter->params[FilterModule::FREQ_CUT_MOD_AMT_T] = 0.0;
-    data->filter->params[FilterModule::RES_T] = 1 / sqrt(2);
-    data->filter->params[FilterModule::RES_MOD_AMT_T] = 0.0;
-    data->filter->ports_in[FilterModule::IN_T] = data->mixer->ports_out[MixerModule::OUT_T];
-    data->filter->process();
+    // data->filter->params[FilterModule::FREQ_CUT_T] = 1000.0;
+    // data->filter->params[FilterModule::FREQ_CUT_MOD_AMT_T] = 0.0;
+    // data->filter->params[FilterModule::RES_T] = 1 / sqrt(2);
+    // data->filter->params[FilterModule::RES_MOD_AMT_T] = 0.0;
+    // data->filter->in_ports[FilterModule::IN_T] = data->mixer->out_ports[MixerModule::OUT_T];
+    // data->filter->process();
 
-    *out++ = data->filter->ports_out[FilterModule::OUT_T];
+    // *out++ = data->filter->out_ports[FilterModule::OUT_T];
   }
 
   auto stop = chrono::high_resolution_clock::now();

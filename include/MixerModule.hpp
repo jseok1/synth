@@ -7,7 +7,12 @@
 
 class MixerModule : public Module {
  public:
-  enum class MixerParam {};
+  enum class MixerParam {
+    amp_mod_amt_1_t,
+    amp_mod_amt_2_t,
+    amp_mod_amt_3_t,
+    amp_mod_amt_4_t
+  };
   enum class MixerInPort {
     in_1_t,
     in_2_t,
@@ -17,9 +22,6 @@ class MixerModule : public Module {
   enum class MixerOutPort {
     out_t
   };
-
-
-  // normalize??
 
   std::unordered_map<MixerParam, double> params;
   std::unordered_map<MixerInPort, double> in_ports;

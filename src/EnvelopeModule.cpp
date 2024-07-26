@@ -66,23 +66,29 @@ void EnvelopeModule::process() {
 
   EnvelopeStage stage_t;
   switch (stage_tm1) {
-    case EnvelopeStage::att:
+    case EnvelopeStage::att: {
       stage_t = env_tm1 == 1 ? EnvelopeStage::dec : EnvelopeStage::att;
       break;
-    case EnvelopeStage::dec:
+    }
+    case EnvelopeStage::dec: {
       stage_t = env_tm1 == sus_tm1 ? EnvelopeStage::sus : EnvelopeStage::dec;
       break;
-    case EnvelopeStage::sus:
+    }
+    case EnvelopeStage::sus: {
       stage_t = EnvelopeStage::sus;
       break;
-    case EnvelopeStage::rel:
+    }
+    case EnvelopeStage::rel: {
       stage_t = env_tm1 == 0 ? EnvelopeStage::idl : EnvelopeStage::rel;
       break;
-    case EnvelopeStage::idl:
+    }
+    case EnvelopeStage::idl: {
       stage_t = EnvelopeStage::idl;
       break;
-    default:
+    }
+    default: {
       throw std::invalid_argument("EnvelopeStage is invalid.");
+    }
   }
 
   if (!gate_tm1 && gate_t || !retr_tm1 && retr_t) {
@@ -110,35 +116,41 @@ double EnvelopeModule::env(
 ) {
   double env_t;
   switch (stage_t) {
-    case EnvelopeStage::att:
+    case EnvelopeStage::att: {
       double att_target_t = 1.2;
       double att_rate_t = std::log((att_target_t - 1) / att_target_t) / att_t;
       env_t = std::min(
         (env_tm1 - att_target_t) * std::exp(att_rate_t) + att_target_t, 1.0
       );
       break;
-    case EnvelopeStage::dec:
+    }
+    case EnvelopeStage::dec: {
       double dec_target_t = sus_t - 0.001;
       double dec_rate_t = -std::log((dec_target_t - 1) / dec_target_t) / dec_t;
       env_t = std::max(
         (env_tm1 - dec_target_t) * std::exp(dec_rate_t) + dec_target_t, sus_t
       );
       break;
-    case EnvelopeStage::sus:
+    }
+    case EnvelopeStage::sus: {
       env_t = sus_t;
       break;
-    case EnvelopeStage::rel:
+    }
+    case EnvelopeStage::rel: {
       double rel_target_t = -0.001;
       double rel_rate_t = -std::log((rel_target_t - 1) / rel_target_t) / rel_t;
       env_t = std::max(
         (env_tm1 - rel_target_t) * std::exp(rel_rate_t) + rel_target_t, 0.0
       );
       break;
-    case EnvelopeStage::idl:
+    }
+    case EnvelopeStage::idl: {
       env_t = 0.0;
       break;
-    default:
+    }
+    default: {
       throw std::invalid_argument("EnvelopeStage is invalid.");
+    }
   }
 
   return env_t;
