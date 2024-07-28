@@ -1,7 +1,7 @@
-const apollo = require("./build/Release/apollo.node");
+const core = require("./build/Release/core.node");
 
-apollo.startStream();
-console.log("started")
+core.startStream();
+console.log("started");
 setTimeout(() => {
-  apollo.stopStream();
+  core.stopStream();
 }, 3000);
