@@ -1,4 +1,4 @@
-#include "EnvelopeModule.hpp"
+#include "EnvelopeModule.h"
 
 #include <algorithm>
 #include <cmath>

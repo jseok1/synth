@@ -1,4 +1,4 @@
-#include "MixerModule.hpp"
+#include "MixerModule.h"
 
 #include <algorithm>
 

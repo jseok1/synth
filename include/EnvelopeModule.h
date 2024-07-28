@@ -1,9 +1,9 @@
-#ifndef ENVELOPE_MODULE_HPP
-#define ENVELOPE_MODULE_HPP
+#ifndef ENVELOPE_MODULE_H
+#define ENVELOPE_MODULE_H
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "Module.h"
 
 class EnvelopeModule : public Module {
  public:

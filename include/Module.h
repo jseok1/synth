@@ -1,5 +1,5 @@
-#ifndef MODULE_HPP
-#define MODULE_HPP
+#ifndef MODULE_H
+#define MODULE_H
 
 class Module {
  public:

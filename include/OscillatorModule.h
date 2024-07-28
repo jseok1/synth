@@ -1,9 +1,9 @@
-#ifndef OSCILLATOR_MODULE_HPP
-#define OSCILLATOR_MODULE_HPP
+#ifndef OSCILLATOR_MODULE_H
+#define OSCILLATOR_MODULE_H
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "Module.h"
 
 class OscillatorModule : public Module {
  public:

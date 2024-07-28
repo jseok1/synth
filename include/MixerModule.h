@@ -1,9 +1,9 @@
-#ifndef MIXER_MODULE_HPP
-#define MIXER_MODULE_HPP
+#ifndef MIXER_MODULE_H
+#define MIXER_MODULE_H
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "Module.h"
 
 class MixerModule : public Module {
  public:

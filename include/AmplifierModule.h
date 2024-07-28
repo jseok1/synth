@@ -1,9 +1,9 @@
-#ifndef AMPLIFIER_MODULE_HPP
-#define AMPLIFIER_MODULE_HPP
+#ifndef AMPLIFIER_MODULE_H
+#define AMPLIFIER_MODULE_H
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "Module.h"
 
 class AmplifierModule : public Module {
  public:

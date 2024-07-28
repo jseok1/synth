@@ -1,9 +1,9 @@
-#ifndef FILTER_MODULE_HPP
-#define FILTER_MODULE_HPP
+#ifndef FILTER_MODULE_H
+#define FILTER_MODULE_H
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "Module.h"
 
 class FilterModule : public Module {
  public:

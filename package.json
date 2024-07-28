@@ -1,0 +1,22 @@
+{
+  "name": "mod-synth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "install": "cmake-js compile"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cmake-js": "^7.3.0",
+    "electron": "^31.3.0",
+    "node-addon-api": "^8.1.0"
+  },
+  "binary": {
+    "napi_versions": [
+      8
+    ]
+  }
+}
