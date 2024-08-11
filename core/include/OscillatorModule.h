@@ -7,29 +7,25 @@
 
 class OscillatorModule : public Module {
  public:
-  enum class OscillatorParam {
+  enum OscillatorParam : int {
     freq_t,
     freq_mod_amt_t,
     pul_width_t,
     pul_width_mod_amt_t
   };
-  enum class OscillatorInPort {
+  enum OscillatorInPort : int {
     freq_mod_t,
     pul_width_mod_t,
     oct_t,
     sync_t
   };
-  enum class OscillatorOutPort {
+  enum OscillatorOutPort : int {
     sin_t,
     tri_t,
     saw_t,
     sqr_t,
     pul_t
   };
-
-  std::unordered_map<OscillatorParam, double> params;
-  std::unordered_map<OscillatorInPort, double> in_ports;
-  std::unordered_map<OscillatorOutPort, double> out_ports;
 
   OscillatorModule(double freq_sample);
 

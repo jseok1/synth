@@ -7,24 +7,20 @@
 
 class FilterModule : public Module {
  public:
-  enum class FilterParam {
+  enum FilterParam : int {
     freq_cut_t,
     freq_cut_mod_amt_t,
     res_t,
     res_mod_amt_t
   };
-  enum class FilterInPort {
+  enum FilterInPort : int {
     freq_cut_mod_t,
     res_mod_t,
     in_t
   };
-  enum class FilterOutPort {
+  enum FilterOutPort : int {
     out_t
   };
-
-  std::unordered_map<FilterParam, double> params;
-  std::unordered_map<FilterInPort, double> in_ports;
-  std::unordered_map<FilterOutPort, double> out_ports;
 
   FilterModule(double freq_sample);
 

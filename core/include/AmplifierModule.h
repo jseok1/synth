@@ -7,20 +7,16 @@
 
 class AmplifierModule : public Module {
  public:
-  enum class AmplifierParam {
+  enum AmplifierParam : int {
     amp_mod_amt_t
   };
-  enum class AmplifierInPort {
+  enum AmplifierInPort : int {
     amp_mod_t,
     in_t
   };
-  enum class AmplifierOutPort {
+  enum AmplifierOutPort : int {
     out_t
   };
-
-  std::unordered_map<AmplifierParam, double> params;
-  std::unordered_map<AmplifierInPort, double> in_ports;
-  std::unordered_map<AmplifierOutPort, double> out_ports;
 
   AmplifierModule(double freq_sample);
 

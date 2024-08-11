@@ -2,7 +2,7 @@ BasedOnStyle: Google
 IndentWidth: 2
 ObjCBlockIndentWidth: 2
 ContinuationIndentWidth: 2
-ColumnLimit: 80
+ColumnLimit: 100
 BinPackArguments: false
 BinPackParameters: false
 AlignAfterOpenBracket: BlockIndent
@@ -12,3 +12,5 @@ InsertNewlineAtEOF: true
 AllowShortEnumsOnASingleLine: false
 ConstructorInitializerIndentWidth: 2
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Empty

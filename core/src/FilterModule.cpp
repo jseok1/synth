@@ -4,21 +4,18 @@
 #include <cmath>
 
 FilterModule::FilterModule(double freq_sample)
-  : Module{freq_sample},
-    params{
+  : Module{freq_sample, {
       {FilterParam::freq_cut_t, 20.0},
       {FilterParam::freq_cut_mod_amt_t, 0.0},
       {FilterParam::res_t, 0.0},
       {FilterParam::res_mod_amt_t, 0.0}
-    },
-    in_ports{
-      {FilterInPort::freq_cut_mod_t, 0.0},
-      {FilterInPort::res_mod_t, 0.0},
-      {FilterInPort::in_t, 0.0}
-    },
-    out_ports{
-      {FilterOutPort::out_t, 0.0}
-    },
+    }, {
+      {FilterInPort::freq_cut_mod_t, InPort{0.0, false}},
+      {FilterInPort::res_mod_t, InPort{0.0, false}},
+      {FilterInPort::in_t, InPort{0.0, false}}
+    }, {
+      {FilterOutPort::out_t, OutPort{0.0}}
+    }},
     in_tm2{0.0},
     in_tm1{0.0},
     out_tm2{0.0},
@@ -33,11 +30,11 @@ void FilterModule::process() {
   auto res_t = params[FilterParam::res_t];
   auto res_mod_amt_t = params[FilterParam::res_mod_amt_t];
 
-  auto freq_cut_mod_t = in_ports[FilterInPort::freq_cut_mod_t];
-  auto res_mod_t = in_ports[FilterInPort::res_mod_t];
-  auto in_t = in_ports[FilterInPort::in_t];
+  auto freq_cut_mod_t = in_ports[FilterInPort::freq_cut_mod_t].volt;
+  auto res_mod_t = in_ports[FilterInPort::res_mod_t].volt;
+  auto in_t = in_ports[FilterInPort::in_t].volt;
 
-  auto &out_t = out_ports[FilterOutPort::out_t];
+  auto &out_t = out_ports[FilterOutPort::out_t].volt;
 
   out_tm2 = out_tm1;
   out_tm1 = out_t;

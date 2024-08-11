@@ -7,7 +7,7 @@
 
 class EnvelopeModule : public Module {
  public:
-  enum class EnvelopeParam {
+  enum EnvelopeParam : int {
     att_t,
     att_mod_amt_t,
     dec_t,
@@ -17,7 +17,7 @@ class EnvelopeModule : public Module {
     rel_t,
     rel_mod_amt_t
   };
-  enum class EnvelopeInPort {
+  enum EnvelopeInPort : int {
     att_mod_t,
     dec_mod_t,
     sus_mod_t,
@@ -25,20 +25,16 @@ class EnvelopeModule : public Module {
     gate_t,
     retr_t
   };
-  enum class EnvelopeOutPort {
+  enum EnvelopeOutPort : int {
     env_t
   };
-
-  std::unordered_map<EnvelopeParam, double> params;
-  std::unordered_map<EnvelopeInPort, double> in_ports;
-  std::unordered_map<EnvelopeOutPort, double> out_ports;
 
   EnvelopeModule(double freq_sample);
 
   void process() override;
 
  private:
-  enum class EnvelopeStage {
+  enum EnvelopeStage : int {
     att,
     dec,
     rel,
@@ -46,7 +42,7 @@ class EnvelopeModule : public Module {
     idl
   };
 
-  EnvelopeStage stage_tm1;
+  int stage_tm1;
   double sus_tm1;
   double gate_tm1;
   double retr_tm1;
@@ -54,7 +50,7 @@ class EnvelopeModule : public Module {
 
   static double env(
     double env_tm1,
-    EnvelopeStage stage_t,
+    int stage_t,
     double att_t,
     double dec_t,
     double sus_t,
