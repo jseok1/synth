@@ -1,34 +1,21 @@
 #include <napi.h>
 
-#include <atomic>
-#include <chrono>
 #include <cmath>
 #include <iostream>
-#include <memory>
 #include <thread>
-#include <vector>
+#include <chrono>
 
-#include "Module.h"
-#include "OscillatorModule.h"
-#include "portaudio/portaudio.h"
+#include "Rack.h"
+#include "portaudio.h"
 
 #define FREQ_SAMPLE 44100
 #define SAMPLE_SIZE 256
 
-// modules graph
-// modules
-//
-
-typedef struct {
-  std::vector<std::shared_ptr<Module>> modules;
-  std::vector<float> params;
+struct PaUserData {
+  Rack rack;
   bool running;
   long tick;
-} PaUserData;
-
-std::atomic<bool *> pointer;  // raw atomic ptr to obj
-std::unique_ptr<bool>
-  storage;  // place for holding ptr while the other is null and handles auto memory management
+} userData;
 
 static int streamCallback(
   const void *inputBuffer,
@@ -41,45 +28,31 @@ static int streamCallback(
   (void)inputBuffer;
   (void)framesPerBuffer;
 
-  auto start = chrono::high_resolution_clock::now();
-
-  auto *current_pointer = pointer.exchange(nullptr);
+  // auto start = chrono::high_resolution_clock::now();
 
   PaUserData *data = (PaUserData *)userData;
   float *out = (float *)outputBuffer;
 
   for (unsigned long i = 0; i < SAMPLE_SIZE; i++) {
-    data->modules[0]->params[OscillatorModule::OscillatorParam::freq_t] = 440;
-    data->modules[0]->params[OscillatorModule::OscillatorParam::freq_mod_amt_t] = 0.0;
-    data->modules[0]->params[OscillatorModule::OscillatorParam::pul_width_t] = 0.5;
-    data->modules[0]->params[OscillatorModule::OscillatorParam::pul_width_mod_amt_t] = 0.0;
-    data->modules[0]->in_ports[OscillatorModule::OscillatorInPort::oct_t] = 0.0;
-    data->modules[0]->in_ports[OscillatorModule::OscillatorInPort::sync_t] = 0.0;
-    data->modules[0]->process();
-
-    *out++ = data->modules[0]->out_ports[OscillatorModule::OscillatorOutPort::tri_t];
+    *out++ = data->rack.process();
   }
 
-  auto stop = chrono::high_resolution_clock::now();
-  auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-
+  // auto stop = chrono::high_resolution_clock::now();
   if (data->tick % 100 == 0) {
-    std::cout << duration.count() << '\n';
+    // auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    // std::cout << duration.count() << '\n';
   }
   data->tick++;
 
-  int flag = data->running ? paContinue : paComplete;
-
-  pointer.store(current_pointer);
-
+  int flag =
+    data->running ? PaStreamCallbackResult::paContinue : PaStreamCallbackResult::paComplete;
   return flag;
 }
 
-void StartStream(const Napi::CallbackInfo &info) {
+void start_stream(const Napi::CallbackInfo &info) {
   auto main = []() {
-    PaError err;
+    PaError err{};
 
-    userData.modules.push_back(std::make_unique<OscillatorModule>(FREQ_SAMPLE));
     userData.running = true;
     userData.tick = 0;
 
@@ -128,16 +101,8 @@ void StartStream(const Napi::CallbackInfo &info) {
   std::thread{main}.detach();
 }
 
-void StopStream(const Napi::CallbackInfo &info) {
-  // I think I can read here (since consumer is read-only and there is only one
-  // producer)
-  auto copy = *storage;
-  copy.running = false;
-
-  auto desired = std::make_unique<PaUserData>(copy);
-  for (auto *expected = storage.get(); !pointer.compare_exchange_weak(expected, desired.get());
-       expected = storage.get());
-  storage = std::move(desired);
+void stop_stream(const Napi::CallbackInfo &info) {
+  userData.running = false;
 }
 
 // idea: if we want anything to be updated on the GUI, you basically collect
@@ -178,8 +143,8 @@ void StopStream(const Napi::CallbackInfo &info) {
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   // TODO: define functions as lambdas in here with closure context __ out of scope?
 
-  exports.Set(Napi::String::New(env, "startStream"), Napi::Function::New(env, StartStream));
-  exports.Set(Napi::String::New(env, "stopStream"), Napi::Function::New(env, StopStream));
+  exports.Set(Napi::String::New(env, "startStream"), Napi::Function::New(env, start_stream));
+  exports.Set(Napi::String::New(env, "stopStream"), Napi::Function::New(env, stop_stream));
 
   return exports;
 }
