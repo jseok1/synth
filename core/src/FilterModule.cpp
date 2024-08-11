@@ -1,4 +1,4 @@
-#include "FilterModule.h"
+#include "FilterModule.hpp"
 
 #include <algorithm>
 #include <cmath>

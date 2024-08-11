@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Module.h"
+#include "Module.hpp"
 
 struct Cable {
   int module_id;
@@ -31,7 +31,7 @@ class Rack {
   std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Cable>>> cables;
 
   void sort_modules(int in_module_id, std::unordered_set<int> &visited_module_ids);
-}
+};
 
 #endif
 

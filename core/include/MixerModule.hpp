@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-#include "Module.h"
+#include "Module.hpp"
 
 class MixerModule : public Module {
  public:

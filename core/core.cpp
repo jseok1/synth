@@ -5,7 +5,7 @@
 #include <thread>
 #include <chrono>
 
-#include "Rack.h"
+#include "Rack.hpp"
 #include "portaudio.h"
 
 #define FREQ_SAMPLE 44100
