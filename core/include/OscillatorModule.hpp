@@ -1,5 +1,5 @@
-#ifndef OSCILLATOR_MODULE_H
-#define OSCILLATOR_MODULE_H
+#ifndef OSCILLATOR_MODULE_HPP
+#define OSCILLATOR_MODULE_HPP
 
 #include <unordered_map>
 

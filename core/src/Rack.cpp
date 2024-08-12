@@ -1,5 +1,6 @@
 #include "Rack.hpp"
 
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -28,8 +29,10 @@ double Rack::process() {
 }
 
 void Rack::add_module(int module_id, std::shared_ptr<Module> module) {
+  remove_module(module_id);
   modules.insert({module_id, module});
 }
+
 void Rack::remove_module(int module_id) {
   modules.erase(module_id);
 
@@ -52,6 +55,7 @@ void Rack::update_module(int module_id, int param_id, double param) {
 }
 
 void Rack::add_cable(int in_module_id, int in_port_id, std::shared_ptr<Cable> cable) {
+  remove_cable(in_module_id, in_port_id);
   cables[in_module_id].insert({in_port_id, cable});
 
   modules[in_module_id]->in_ports[in_port_id].is_connected = true;
@@ -78,6 +82,12 @@ void Rack::sort_modules() {
       sort_modules(in_module_id, visited_module_ids);
     }
   }
+
+  std::cout << "Sorted: ";
+  for (auto module_id : sorted_module_ids) {
+    std::cout << module_id << ' ';
+  }
+  std::cout << '\n';
 }
 
 void Rack::sort_modules(int in_module_id, std::unordered_set<int> &visited_module_ids) {

@@ -1,5 +1,5 @@
-#ifndef AMPLIFIER_MODULE_H
-#define AMPLIFIER_MODULE_H
+#ifndef AMPLIFIER_MODULE_HPP
+#define AMPLIFIER_MODULE_HPP
 
 #include <unordered_map>
 

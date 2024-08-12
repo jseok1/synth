@@ -1,10 +1,11 @@
 #include <napi.h>
 
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <thread>
-#include <chrono>
 
+#include "OscillatorModule.hpp"
 #include "Rack.hpp"
 #include "portaudio.h"
 
@@ -49,7 +50,7 @@ static int streamCallback(
   return flag;
 }
 
-void start_stream(const Napi::CallbackInfo &info) {
+void StartStream(const Napi::CallbackInfo &args) {
   auto main = []() {
     PaError err{};
 
@@ -79,6 +80,7 @@ void start_stream(const Napi::CallbackInfo &info) {
       return;
     }
 
+    std::cout << "Starting stream..." << '\n';
     while ((err = Pa_IsStreamActive(stream)) == 1) {
       Pa_Sleep(100);
     }
@@ -88,6 +90,7 @@ void start_stream(const Napi::CallbackInfo &info) {
       return;
     }
 
+    std::cout << "Ending stream..." << '\n';
     err = Pa_CloseStream(stream);
     if (err != paNoError) {
       Pa_Terminate();
@@ -101,7 +104,7 @@ void start_stream(const Napi::CallbackInfo &info) {
   std::thread{main}.detach();
 }
 
-void stop_stream(const Napi::CallbackInfo &info) {
+void StopStream(const Napi::CallbackInfo &args) {
   userData.running = false;
 }
 
@@ -109,45 +112,98 @@ void stop_stream(const Napi::CallbackInfo &info) {
 // 1/60 s worth of data and send it all at once (rate limit sending info back
 // to match refresh rate)
 
-// Napi::Number add_module(const Napi::CallbackInfo &info) {
-//   // init a new module and return its id (index)
-//   // if ("__OSCILLATOR_MODULE")
-//   // topo sort vector?
-// }
+void AddModule(const Napi::CallbackInfo &args) {
+  Napi::Env env = args.Env();
+  if (args.Length() != 2 || !args[0].IsNumber() || !args[1].IsNumber()) {
+    Napi::TypeError::New(env, "Usage: addModule(moduleId: number, moduleType: number): void").ThrowAsJavaScriptException();
+  }
 
-// void remove_module(const Napi::CallbackInfo &info) {
-//   // topo sort vector?
-// }
+  int module_id = args[0].As<Napi::Number>().Int32Value();
+  int module_type = args[1].As<Napi::Number>().Int32Value();
 
-// void add_patch(const Napi::CallbackInfo &info) {
-//   // module 1 to 2
-// }
+  std::shared_ptr<Module> module;
+  switch (module_type) {
+    case 0: {
+      module = std::make_shared<OscillatorModule>(FREQ_SAMPLE);
+      break;
+    }
+    default: {
+      Napi::TypeError::New(env, "moduleType is invalid.").ThrowAsJavaScriptException();
+    }
+  }
 
-// void remove_patch(const Napi::CallbackInfo &info) {
-//   // module 1 to 2
-// }
+  userData.rack.add_module(module_id, module);
+  userData.rack.sort_modules();
+}
 
-// Napi::Number get_param(const Napi::CallbackInfo &info) {
-//   // modify userData
-// }
+void RemoveModule(const Napi::CallbackInfo &args) {
+  Napi::Env env = args.Env();
+  if (args.Length() != 1 || !args[0].IsNumber()) {
+    Napi::TypeError::New(env, "Usage: removeModule(moduleId: number): void").ThrowAsJavaScriptException();
+  }
 
-// void set_param(const Napi::CallbackInfo &info) {
-//   auto new_coeffs = std::make_unique<>(new_coeffs);
-//   for (auto *expected = storage.get();
-//        !coeffs.compare_exchange_weak(expected, new_coeffs.get());
-//        expected = storage.get()) {
-//     storage = std::move(new_coeffs);
-//   }
-// }
+  int module_id = args[0].As<Napi::Number>().Int32Value();
+
+  userData.rack.remove_module(module_id);
+  userData.rack.sort_modules();
+}
+
+void UpdateModule(const Napi::CallbackInfo &args) {
+  Napi::Env env = args.Env();
+  if (args.Length() != 3 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber()) {
+    Napi::TypeError::New(env, "Usage: updateModule(moduleId: number, paramId: number, param: number): void").ThrowAsJavaScriptException();
+  }
+
+  int module_id = args[0].As<Napi::Number>().Int32Value();
+  int param_id = args[1].As<Napi::Number>().Int32Value();
+  double param = args[2].As<Napi::Number>().DoubleValue();
+
+  userData.rack.update_module(module_id, param_id, param);
+}
+
+// TODO: make_unique and pass ownership
+void AddCable(const Napi::CallbackInfo &args) {
+  Napi::Env env = args.Env();
+  if (args.Length() != 4 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() || !args[3].IsNumber()) {
+    Napi::TypeError::New(env, "Usage: addCable(inModuleId: number, inPortId: number, outModuleId: number, outPortId: number): void").ThrowAsJavaScriptException();
+  }
+
+  int in_module_id = args[0].As<Napi::Number>().Int32Value();
+  int in_port_id = args[1].As<Napi::Number>().Int32Value();
+  int out_module_id = args[2].As<Napi::Number>().Int32Value();
+  int out_port_id = args[3].As<Napi::Number>().Int32Value();
+
+  std::shared_ptr<Cable> cable = std::make_shared<Cable>(out_module_id, out_port_id);
+
+  userData.rack.add_cable(in_module_id, in_port_id, cable);
+  userData.rack.sort_modules();
+}
+
+void RemoveCable(const Napi::CallbackInfo &args) {
+  Napi::Env env = args.Env();
+  if (args.Length() != 2 || !args[0].IsNumber() || !args[1].IsNumber()) {
+    Napi::TypeError::New(env, "Usage: removeCable(inModuleId: number, inPortId: number): void").ThrowAsJavaScriptException();
+  }
+
+  int in_module_id = args[0].As<Napi::Number>().Int32Value();
+  int in_port_id = args[1].As<Napi::Number>().Int32Value();
+
+  userData.rack.remove_cable(in_module_id, in_port_id);
+  userData.rack.sort_modules();
+}
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   // TODO: define functions as lambdas in here with closure context __ out of scope?
 
-  exports.Set(Napi::String::New(env, "startStream"), Napi::Function::New(env, start_stream));
-  exports.Set(Napi::String::New(env, "stopStream"), Napi::Function::New(env, stop_stream));
+  exports.Set(Napi::String::New(env, "startStream"), Napi::Function::New(env, StartStream));
+  exports.Set(Napi::String::New(env, "stopStream"), Napi::Function::New(env, StopStream));
+  exports.Set(Napi::String::New(env, "addModule"), Napi::Function::New(env, AddModule));
+  exports.Set(Napi::String::New(env, "removeModule"), Napi::Function::New(env, RemoveModule));
+  exports.Set(Napi::String::New(env, "updateModule"), Napi::Function::New(env, UpdateModule));
+  exports.Set(Napi::String::New(env, "addCable"), Napi::Function::New(env, AddCable));
+  exports.Set(Napi::String::New(env, "removeCable"), Napi::Function::New(env, RemoveCable));
 
   return exports;
 }
 
-// TODO: not right
-NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init)
+NODE_API_MODULE(PROJECT_NAME, Init)

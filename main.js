@@ -3,7 +3,13 @@ const path = require("node:path");
 
 const core = require("./build/Release/core.node");
 core.startStream();
-console.log("started");
+core.addModule(0, 0);
+core.addModule(1, 0);
+core.addModule(2, 0);
+core.addModule(3, 0);
+core.addCable(0, 0, 1, 0);
+core.addCable(0, 1, 2, 0);
+core.addCable(3, 0, 0, 0);
 setTimeout(() => {
   core.stopStream();
 }, 3000);

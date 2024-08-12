@@ -1,5 +1,5 @@
-#ifndef ENVELOPE_MODULE_H
-#define ENVELOPE_MODULE_H
+#ifndef ENVELOPE_MODULE_HPP
+#define ENVELOPE_MODULE_HPP
 
 #include <unordered_map>
 

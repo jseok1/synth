@@ -1,5 +1,5 @@
-// #ifndef RCU_H
-// #define RCU_H
+// #ifndef RCU_HPP
+// #define RCU_HPP
 
 // #include <atomic>
 // #include <memory>

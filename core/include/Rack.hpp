@@ -1,5 +1,5 @@
-#ifndef RACK_H
-#define RACK_H
+#ifndef RACK_HPP
+#define RACK_HPP
 
 #include <memory>
 #include <unordered_map>

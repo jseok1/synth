@@ -1,5 +1,5 @@
-#ifndef FILTER_MODULE_H
-#define FILTER_MODULE_H
+#ifndef FILTER_MODULE_HPP
+#define FILTER_MODULE_HPP
 
 #include <unordered_map>
 

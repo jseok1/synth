@@ -1,5 +1,5 @@
-#ifndef MIXER_MODULE_H
-#define MIXER_MODULE_H
+#ifndef MIXER_MODULE_HPP
+#define MIXER_MODULE_HPP
 
 #include <unordered_map>
 
