@@ -34,6 +34,7 @@ class OscillatorModule : public Module {
  private:
   double phase_tm1;
   double sync_tm1;
+  double freq_tm1; // TODO: remove
 
   static double sin(double phase_t);
   static double tri(double phase_t);

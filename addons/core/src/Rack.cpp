@@ -6,7 +6,13 @@
 #include <unordered_set>
 #include <vector>
 
-Rack::Rack() : sorted_module_ids{}, modules{}, cables{} {}
+#include "OutRackModule.hpp"
+
+// TODO: hack
+Rack::Rack()
+  : sorted_module_ids{}, modules{}, cables{} {
+    add_module(0, std::make_shared<OutRackModule>(44100));
+  }
 
 double Rack::process() {
   for (auto in_module_id : sorted_module_ids) {
@@ -25,7 +31,7 @@ double Rack::process() {
     modules[in_module_id]->process();
   }
   // some sort of fixed output module
-  return 0.0;
+  return modules[0]->in_ports[0].volt;  // hack
 }
 
 void Rack::add_module(int module_id, std::shared_ptr<Module> module) {
@@ -51,6 +57,7 @@ void Rack::remove_module(int module_id) {
 }
 
 void Rack::update_module(int module_id, int param_id, double param) {
+  modules[module_id]->start = std::chrono::high_resolution_clock::now();
   modules[module_id]->params[param_id] = param;
 }
 

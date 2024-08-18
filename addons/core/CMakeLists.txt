@@ -12,15 +12,15 @@ add_compile_definitions(_USE_MATH_DEFINES)
 
 include_directories(${CMAKE_JS_INC})
 
-file(GLOB_RECURSE SOURCE_FILES core/core.cpp core/src/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
-include_directories(core/include)
-include_directories(core/lib/portaudio/include)
-add_subdirectory(core/lib/portaudio)
+include_directories(include)
+include_directories(lib/portaudio/include)
+add_subdirectory(lib/portaudio)
 target_link_libraries(${PROJECT_NAME} portaudio_static)
 
 # Include N-API wrappers

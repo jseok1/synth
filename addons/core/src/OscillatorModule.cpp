@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <chrono>
 
 OscillatorModule::OscillatorModule(double freq_sample)
   : Module{freq_sample, {
@@ -22,7 +24,8 @@ OscillatorModule::OscillatorModule(double freq_sample)
       {OscillatorOutPort::pul_t, OutPort{0.0}}
     }},
     phase_tm1{0.0},
-    sync_tm1{0.0} {}
+    sync_tm1{0.0},
+    freq_tm1{0.0} {}
 
 void OscillatorModule::process() {
   auto freq_t = params[OscillatorParam::freq_t];
@@ -40,6 +43,13 @@ void OscillatorModule::process() {
   auto& saw_t = out_ports[OscillatorOutPort::saw_t].volt;
   auto& sqr_t = out_ports[OscillatorOutPort::sqr_t].volt;
   auto& pul_t = out_ports[OscillatorOutPort::pul_t].volt;
+
+  if (freq_tm1 != freq_t) {
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << duration.count() << '\n';
+  }
+  freq_tm1 = freq_t;
 
   freq_t *= std::pow(2, oct_t + freq_mod_t * freq_mod_amt_t);
   pul_width_t += pul_width_mod_t * pul_width_mod_amt_t;

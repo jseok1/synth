@@ -2,21 +2,28 @@
   "name": "mod-synth",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "./out/main/index.js",
+  "author": "https://github.com/jseok1",
   "scripts": {
-    "start": "electron .",
-    "install": "cmake-js compile"
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "compile:debug": "cmake-js compile --config Debug --directory ./addons/core --out ./addons/core/build && copyfiles --flat ./addons/core/build/Debug/core.node ./resources",
+    "compile:release": "cmake-js compile --config Release --directory ./addons/core --out ./addons/core/build && copyfiles --flat ./addons/core/build/Release/core.node ./resources"
   },
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0"
+  },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
     "cmake-js": "^7.3.0",
-    "electron": "^31.3.0",
-    "node-addon-api": "^8.1.0"
-  },
-  "binary": {
-    "napi_versions": [
-      8
-    ]
+    "copyfiles": "^2.4.1",
+    "electron": "^31.0.2",
+    "electron-vite": "^2.3.0",
+    "node-addon-api": "^8.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.3.1"
   }
 }

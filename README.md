@@ -21,7 +21,7 @@ https://stackoverflow.com/questions/14142023/why-is-a-single-producer-single-con
 https://portaudio.music.columbia.narkive.com/snc4IQsB/multithreading-and-mutexes
 https://www.youtube.com/watch?v=Q0vrQFyAdWI
 https://www.youtube.com/watch?v=PoZAo2Vikbo
-
+https://stackoverflow.com/questions/23214614/time-between-callback-calls/23226247#23226247
 
 # Graph Structure
 Modules and ports with cables form a DAG.

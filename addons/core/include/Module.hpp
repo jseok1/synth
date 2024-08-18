@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <chrono>
 // 1 - IDs. Cables managed by Synth. Just use a set of edges. Runtime wouldn't be the best.
 // But simple. Also Module/Ports don't need to know about their IDs.
 // NEED to copy volt. AND zero out from Synth.
@@ -33,6 +34,7 @@ class Module {
   virtual ~Module();
 
   virtual void process() = 0;
+  std::chrono::high_resolution_clock::time_point start;
 
  protected:
   const double freq_sample;

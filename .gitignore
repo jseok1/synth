@@ -3,3 +3,7 @@
 build
 node_modules
 package-lock.json
+dist
+out
+.DS_Store
+*.log*

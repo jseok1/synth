@@ -1,4 +1,5 @@
 #include <napi.h>
+#include <portaudio.h>
 
 #include <chrono>
 #include <cmath>
@@ -7,7 +8,6 @@
 
 #include "OscillatorModule.hpp"
 #include "Rack.hpp"
-#include "portaudio.h"
 
 #define FREQ_SAMPLE 44100
 #define SAMPLE_SIZE 256
@@ -64,8 +64,16 @@ void StartStream(const Napi::CallbackInfo &args) {
     }
 
     PaStream *stream;
-    err = Pa_OpenDefaultStream(
-      &stream, 0, 1, paFloat32, FREQ_SAMPLE, SAMPLE_SIZE, streamCallback, &userData
+    PaStreamParameters outputParameters;
+    outputParameters.device = Pa_GetDefaultOutputDevice();
+    outputParameters.channelCount = 1;
+    outputParameters.sampleFormat = paFloat32;
+    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+
+    std::cout << "Suggested latency: " << outputParameters.suggestedLatency << std::endl;
+    err = Pa_OpenStream(
+      &stream, NULL, &outputParameters, FREQ_SAMPLE, SAMPLE_SIZE, paClipOff, streamCallback, &userData
     );
     if (err != paNoError) {
       Pa_Terminate();
@@ -115,7 +123,8 @@ void StopStream(const Napi::CallbackInfo &args) {
 void AddModule(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
   if (args.Length() != 2 || !args[0].IsNumber() || !args[1].IsNumber()) {
-    Napi::TypeError::New(env, "Usage: addModule(moduleId: number, moduleType: number): void").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Usage: addModule(moduleId: number, moduleType: number): void")
+      .ThrowAsJavaScriptException();
   }
 
   int module_id = args[0].As<Napi::Number>().Int32Value();
@@ -139,7 +148,8 @@ void AddModule(const Napi::CallbackInfo &args) {
 void RemoveModule(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
   if (args.Length() != 1 || !args[0].IsNumber()) {
-    Napi::TypeError::New(env, "Usage: removeModule(moduleId: number): void").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Usage: removeModule(moduleId: number): void")
+      .ThrowAsJavaScriptException();
   }
 
   int module_id = args[0].As<Napi::Number>().Int32Value();
@@ -151,7 +161,10 @@ void RemoveModule(const Napi::CallbackInfo &args) {
 void UpdateModule(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
   if (args.Length() != 3 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber()) {
-    Napi::TypeError::New(env, "Usage: updateModule(moduleId: number, paramId: number, param: number): void").ThrowAsJavaScriptException();
+    Napi::TypeError::New(
+      env, "Usage: updateModule(moduleId: number, paramId: number, param: number): void"
+    )
+      .ThrowAsJavaScriptException();
   }
 
   int module_id = args[0].As<Napi::Number>().Int32Value();
@@ -164,8 +177,14 @@ void UpdateModule(const Napi::CallbackInfo &args) {
 // TODO: make_unique and pass ownership
 void AddCable(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
-  if (args.Length() != 4 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() || !args[3].IsNumber()) {
-    Napi::TypeError::New(env, "Usage: addCable(inModuleId: number, inPortId: number, outModuleId: number, outPortId: number): void").ThrowAsJavaScriptException();
+  if (args.Length() != 4 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() ||
+      !args[3].IsNumber()) {
+    Napi::TypeError::New(
+      env,
+      "Usage: addCable(inModuleId: number, inPortId: number, outModuleId: number, outPortId: "
+      "number): void"
+    )
+      .ThrowAsJavaScriptException();
   }
 
   int in_module_id = args[0].As<Napi::Number>().Int32Value();
@@ -182,7 +201,8 @@ void AddCable(const Napi::CallbackInfo &args) {
 void RemoveCable(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
   if (args.Length() != 2 || !args[0].IsNumber() || !args[1].IsNumber()) {
-    Napi::TypeError::New(env, "Usage: removeCable(inModuleId: number, inPortId: number): void").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "Usage: removeCable(inModuleId: number, inPortId: number): void")
+      .ThrowAsJavaScriptException();
   }
 
   int in_module_id = args[0].As<Napi::Number>().Int32Value();
@@ -190,6 +210,10 @@ void RemoveCable(const Napi::CallbackInfo &args) {
 
   userData.rack.remove_cable(in_module_id, in_port_id);
   userData.rack.sort_modules();
+}
+
+void Hello(const Napi::CallbackInfo &args) {
+  std::cout << "Hello world" << std::endl;
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -202,6 +226,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "updateModule"), Napi::Function::New(env, UpdateModule));
   exports.Set(Napi::String::New(env, "addCable"), Napi::Function::New(env, AddCable));
   exports.Set(Napi::String::New(env, "removeCable"), Napi::Function::New(env, RemoveCable));
+  exports.Set(Napi::String::New(env, "hello"), Napi::Function::New(env, Hello));
 
   return exports;
 }
