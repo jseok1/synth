@@ -52,29 +52,6 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on("ping", () => console.log("pong"));
 
-  // API STUFF
-  // ipcMain.on('start-stream', (_, ...args) => {
-  //   addon.startStream(...args)
-  // })
-  // ipcMain.on('stop-stream', (_, ...args) => {
-  //   addon.stopStream(...args)
-  // })
-  // ipcMain.on('add-module', (_, ...args) => {
-  //   addon.addModule(...args)
-  // })
-  // ipcMain.on('remove-module', (_, ...args) => {
-  //   addon.removeModule(...args)
-  // })
-  // ipcMain.on('update-module', (_, ...args) => {
-  //   addon.updateModule(...args)
-  // })
-  // ipcMain.on('add-cable', (_, ...args) => {
-  //   addon.addCable(...args)
-  // })
-  // ipcMain.on('remove-cable', (_, ...args) => {
-  //   addon.removeCable(...args)
-  // })
-
   createWindow();
 
   app.on("activate", function () {
@@ -93,5 +70,5 @@ app.on("window-all-closed", () => {
   }
 });
 
-// In this file you can include the rest of your app"s specific main process
+// In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

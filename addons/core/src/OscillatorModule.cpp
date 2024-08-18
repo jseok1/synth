@@ -14,7 +14,7 @@ OscillatorModule::OscillatorModule(double freq_sample)
     }, {
       {OscillatorInPort::freq_mod_t, InPort{0.0, false}},
       {OscillatorInPort::pul_width_mod_t, InPort{0.0, false}},
-      {OscillatorInPort::oct_t, InPort{0.0, false}},
+      {OscillatorInPort::volt_per_oct_t, InPort{0.0, false}},
       {OscillatorInPort::sync_t, InPort{0.0, false}}
     }, {
       {OscillatorOutPort::sin_t, OutPort{0.0}},
@@ -35,7 +35,7 @@ void OscillatorModule::process() {
 
   auto freq_mod_t = in_ports[OscillatorInPort::freq_mod_t].volt;
   auto pul_width_mod_t = in_ports[OscillatorInPort::pul_width_mod_t].volt;
-  auto oct_t = in_ports[OscillatorInPort::oct_t].volt;
+  auto volt_per_oct_t = in_ports[OscillatorInPort::volt_per_oct_t].volt;
   auto sync_t = in_ports[OscillatorInPort::sync_t].volt;
 
   auto& sin_t = out_ports[OscillatorOutPort::sin_t].volt;
@@ -51,7 +51,7 @@ void OscillatorModule::process() {
   }
   freq_tm1 = freq_t;
 
-  freq_t *= std::pow(2, oct_t + freq_mod_t * freq_mod_amt_t);
+  freq_t *= std::pow(2, volt_per_oct_t + freq_mod_t * freq_mod_amt_t);
   pul_width_t += pul_width_mod_t * pul_width_mod_amt_t;
 
   freq_t = std::clamp(freq_t, 0.0, freq_sample / 2);

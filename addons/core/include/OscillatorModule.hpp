@@ -16,7 +16,7 @@ class OscillatorModule : public Module {
   enum OscillatorInPort : int {
     freq_mod_t,
     pul_width_mod_t,
-    oct_t,
+    volt_per_oct_t,
     sync_t
   };
   enum OscillatorOutPort : int {

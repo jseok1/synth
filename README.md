@@ -1,15 +1,14 @@
 # TODO
+* Extract mapping of module types and port types into a single source of truth shared by JS and C++.
+* Look into RCU for handling concurrency in real-time systems.
 * Reimplement VCO using wavetables to mimic analog.
 * Reimplement VCF using digital Moog ladder filter to mimic analog.
-* Rename volt_per_oct_t.
 * Implement keyboard tracking for VCF.
 * Reverb.
 * Delay.
 * Noise.
 * LFO.
-* Fix modulation and think about VCA amp_t vs amp_mod_t.
-* Better separation of C++ and JS.
-* Look into CMake.js instead of node-gyp?
+* Add C++ performance logging.
 
 # Useful Resources
 https://www.earlevel.com/main/
@@ -28,5 +27,6 @@ Modules and ports with cables form a DAG.
 Modules may have multiple edges going to another module.
 Input ports can have at most one cable, thus uniquely identify cables.
 Output ports may have more than one cable.
-A topological sort of a DAG is the reversed topological sort of the reversed DAG.
-Modules are vertices. Ports identify edges.
+A topological sort of a DAG is the reversed topological sort of the reversed DAG. Therefore, cables can be represented as directed edges from input ports to output ports.
+Modules are vertices. Ports identify edges. There may be multiple edges from one vertex to another.
+There can be multiple source vertices but only one destination vertex.
