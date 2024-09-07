@@ -1,4 +1,4 @@
-#include "Module.hpp"
+#include "modules/Module.hpp"
 
 Module::Module(
   double freq_sample,

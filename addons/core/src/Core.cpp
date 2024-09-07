@@ -6,11 +6,11 @@
 #include <iostream>
 #include <thread>
 
-#include "OscillatorModule.hpp"
+#include "modules/OscillatorModule.hpp"
 #include "Rack.hpp"
 
-#define FREQ_SAMPLE 44100
-#define SAMPLE_SIZE 256
+const double freq_sample = 44100;
+const unsigned long sample_size = 256;
 
 struct PaUserData {
   Rack rack;
@@ -18,6 +18,7 @@ struct PaUserData {
   long tick;
 } userData;
 
+// could be a lambda
 static int streamCallback(
   const void *inputBuffer,
   void *outputBuffer,
@@ -34,7 +35,7 @@ static int streamCallback(
   PaUserData *data = (PaUserData *)userData;
   float *out = (float *)outputBuffer;
 
-  for (unsigned long i = 0; i < SAMPLE_SIZE; i++) {
+  for (unsigned long i = 0; i < sample_size; i++) {
     *out++ = data->rack.process();
   }
 
@@ -73,7 +74,7 @@ void StartStream(const Napi::CallbackInfo &args) {
 
     std::cout << "Suggested latency: " << outputParameters.suggestedLatency << std::endl;
     err = Pa_OpenStream(
-      &stream, NULL, &outputParameters, FREQ_SAMPLE, SAMPLE_SIZE, paClipOff, streamCallback, &userData
+      &stream, NULL, &outputParameters, freq_sample, sample_size, paClipOff, streamCallback, &userData
     );
     if (err != paNoError) {
       Pa_Terminate();
@@ -133,7 +134,7 @@ void AddModule(const Napi::CallbackInfo &args) {
   std::shared_ptr<Module> module;
   switch (module_type) {
     case 0: {
-      module = std::make_shared<OscillatorModule>(FREQ_SAMPLE);
+      module = std::make_shared<OscillatorModule>(freq_sample);
       break;
     }
     default: {
@@ -158,11 +159,11 @@ void RemoveModule(const Napi::CallbackInfo &args) {
   userData.rack.sort_modules();
 }
 
-void UpdateModule(const Napi::CallbackInfo &args) {
+void UpdateParam(const Napi::CallbackInfo &args) {
   Napi::Env env = args.Env();
   if (args.Length() != 3 || !args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber()) {
     Napi::TypeError::New(
-      env, "Usage: updateModule(moduleId: number, paramId: number, param: number): void"
+      env, "Usage: updateParam(moduleId: number, paramId: number, param: number): void"
     )
       .ThrowAsJavaScriptException();
   }
@@ -171,7 +172,7 @@ void UpdateModule(const Napi::CallbackInfo &args) {
   int param_id = args[1].As<Napi::Number>().Int32Value();
   double param = args[2].As<Napi::Number>().DoubleValue();
 
-  userData.rack.update_module(module_id, param_id, param);
+  userData.rack.update_param(module_id, param_id, param);
 }
 
 // TODO: make_unique and pass ownership
@@ -223,7 +224,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "stopStream"), Napi::Function::New(env, StopStream));
   exports.Set(Napi::String::New(env, "addModule"), Napi::Function::New(env, AddModule));
   exports.Set(Napi::String::New(env, "removeModule"), Napi::Function::New(env, RemoveModule));
-  exports.Set(Napi::String::New(env, "updateModule"), Napi::Function::New(env, UpdateModule));
+  exports.Set(Napi::String::New(env, "updateParam"), Napi::Function::New(env, UpdateParam));
   exports.Set(Napi::String::New(env, "addCable"), Napi::Function::New(env, AddCable));
   exports.Set(Napi::String::New(env, "removeCable"), Napi::Function::New(env, RemoveCable));
   exports.Set(Napi::String::New(env, "hello"), Napi::Function::New(env, Hello));

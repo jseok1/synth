@@ -10,7 +10,7 @@ const api = {
   stopStream: core.stopStream,
   addModule: core.addModule,
   removeModule: core.removeModule,
-  updateModule: core.updateModule,
+  updateParam: core.updateParam,
   addCable: core.addCable,
   removeCable: core.removeCable,
 };

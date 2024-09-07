@@ -1,4 +1,4 @@
-#include "OscillatorModule.hpp"
+#include "modules/OscillatorModule.hpp"
 
 #include <algorithm>
 #include <cmath>

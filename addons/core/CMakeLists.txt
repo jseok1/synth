@@ -12,7 +12,7 @@ add_compile_definitions(_USE_MATH_DEFINES)
 
 include_directories(${CMAKE_JS_INC})
 
-file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
+file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.c)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
@@ -20,6 +20,7 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
 include_directories(include)
 include_directories(lib/portaudio/include)
+
 add_subdirectory(lib/portaudio)
 target_link_libraries(${PROJECT_NAME} portaudio_static)
 

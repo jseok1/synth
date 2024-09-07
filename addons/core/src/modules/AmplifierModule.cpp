@@ -1,4 +1,4 @@
-#include "AmplifierModule.hpp"
+#include "modules/AmplifierModule.hpp"
 
 #include <algorithm>
 

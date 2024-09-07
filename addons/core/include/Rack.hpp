@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Module.hpp"
+#include "modules/Module.hpp"
 
 struct Cable {
   int module_id;
@@ -20,7 +20,7 @@ class Rack {
   double process();
   void add_module(int module_id, std::shared_ptr<Module> module);
   void remove_module(int module_id);
-  void update_module(int module_id, int param_id, double param);
+  void update_param(int module_id, int param_id, double param);
   void add_cable(int in_module_id, int in_port_id, std::shared_ptr<Cable> cable);
   void remove_cable(int in_module_id, int in_port_id);
   void sort_modules();
@@ -29,6 +29,8 @@ class Rack {
   std::vector<int> sorted_module_ids;
   std::unordered_map<int, std::shared_ptr<Module>> modules;
   std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Cable>>> cables;
+  int from_device_module_id;
+  int to_device_module_id;
 
   void sort_modules(int in_module_id, std::unordered_set<int> &visited_module_ids);
 };

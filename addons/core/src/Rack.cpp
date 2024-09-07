@@ -6,13 +6,15 @@
 #include <unordered_set>
 #include <vector>
 
-#include "OutRackModule.hpp"
+#include "modules/FromDeviceModule.hpp"
+#include "modules/ToDeviceModule.hpp"
 
 // TODO: hack
 Rack::Rack()
-  : sorted_module_ids{}, modules{}, cables{} {
-    add_module(0, std::make_shared<OutRackModule>(44100));
-  }
+  : sorted_module_ids{}, modules{}, cables{}, from_device_module_id{-1}, to_device_module_id{-1} {
+  add_module(0, std::make_shared<ToDeviceModule>(44100));
+  to_device_module_id = 0;
+}
 
 double Rack::process() {
   for (auto in_module_id : sorted_module_ids) {
@@ -30,12 +32,14 @@ double Rack::process() {
 
     modules[in_module_id]->process();
   }
-  // some sort of fixed output module
-  return modules[0]->in_ports[0].volt;  // hack
+
+  return to_device_module_id > 0 ? modules[to_device_module_id]->in_ports[0].volt : 0.0;
 }
 
 void Rack::add_module(int module_id, std::shared_ptr<Module> module) {
   remove_module(module_id);
+
+  // auto copy = modules.val(); // return const reference? think about operation as map and filter?
   modules.insert({module_id, module});
 }
 
@@ -56,7 +60,7 @@ void Rack::remove_module(int module_id) {
   }
 }
 
-void Rack::update_module(int module_id, int param_id, double param) {
+void Rack::update_param(int module_id, int param_id, double param) {
   modules[module_id]->start = std::chrono::high_resolution_clock::now();
   modules[module_id]->params[param_id] = param;
 }

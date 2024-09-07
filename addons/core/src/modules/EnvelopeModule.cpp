@@ -1,4 +1,4 @@
-#include "EnvelopeModule.hpp"
+#include "modules/EnvelopeModule.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -84,7 +84,7 @@ void EnvelopeModule::process() {
       break;
     }
     default: {
-      throw std::invalid_argument("EnvelopeStage is invalid.");
+      throw std::invalid_argument("ERROR::ENVELOPE_MODULE::ENVELOPE_STAGE_INVALID");
     }
   }
 
@@ -140,7 +140,7 @@ double EnvelopeModule::env(
       break;
     }
     default: {
-      throw std::invalid_argument("EnvelopeStage is invalid.");
+      throw std::invalid_argument("ERROR::ENVELOPE_MODULE::ENVELOPE_STAGE_INVALID");
     }
   }
 

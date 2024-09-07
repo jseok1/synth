@@ -1,16 +1,23 @@
-# TODO
+# SynthSandbox [WIP]
+
+
+
+## TODO
 * Extract mapping of module types and port types into a single source of truth shared by JS and C++.
 * Look into RCU for handling concurrency in real-time systems.
 * Reimplement VCO using wavetables to mimic analog.
 * Reimplement VCF using digital Moog ladder filter to mimic analog.
-* Implement keyboard tracking for VCF.
-* Reverb.
-* Delay.
-* Noise.
-* LFO.
+* Implement key tracking for VCF.
+* Modules: LFO, sequencer, delay, reverb, noise.
 * Add C++ performance logging.
+* Change shared_ptr to unique_ptr.
+* Think of a good name.
+* synth-sandbox
+* modular-madness
+* rainstorm
+* synth-waves
 
-# Useful Resources
+## Useful Resources
 https://www.earlevel.com/main/
 https://dsp.stackexchange.com/questions/2555/help-with-equations-for-exponential-adsr-envelope
 https://github.com/PortAudio/portaudio/wiki/Tips_Callbacks
@@ -22,7 +29,7 @@ https://www.youtube.com/watch?v=Q0vrQFyAdWI
 https://www.youtube.com/watch?v=PoZAo2Vikbo
 https://stackoverflow.com/questions/23214614/time-between-callback-calls/23226247#23226247
 
-# Graph Structure
+## Graph Structure
 Modules and ports with cables form a DAG.
 Modules may have multiple edges going to another module.
 Input ports can have at most one cable, thus uniquely identify cables.

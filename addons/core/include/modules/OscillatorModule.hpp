@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-#include "Module.hpp"
+#include "modules/Module.hpp"
 
 class OscillatorModule : public Module {
  public:
