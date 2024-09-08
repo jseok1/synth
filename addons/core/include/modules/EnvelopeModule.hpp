@@ -8,25 +8,25 @@
 class EnvelopeModule : public Module {
  public:
   enum EnvelopeParam : int {
-    att_t,
-    att_mod_amt_t,
-    dec_t,
-    dec_mod_amt_t,
-    sus_t,
-    sus_mod_amt_t,
-    rel_t,
-    rel_mod_amt_t
+    __ATT,
+    __ATT_MOD_AMT,
+    __DEC,
+    __DEC_MOD_AMT,
+    __SUS,
+    __SUS_MOD_AMT,
+    __REL,
+    __REL_MOD_AMT
   };
   enum EnvelopeInPort : int {
-    att_mod_t,
-    dec_mod_t,
-    sus_mod_t,
-    rel_mod_t,
-    gate_t,
-    retr_t
+    __ATT_MOD,
+    __DEC_MOD,
+    __SUS_MOD,
+    __REL_MOD,
+    __GATE,
+    __RETR
   };
   enum EnvelopeOutPort : int {
-    env_t
+    __ENV
   };
 
   EnvelopeModule(double freq_sample);
@@ -35,11 +35,11 @@ class EnvelopeModule : public Module {
 
  private:
   enum EnvelopeStage : int {
-    att,
-    dec,
-    rel,
-    sus,
-    idl
+    __ATT_STAGE,
+    __DEC_STAGE,
+    __REL_STAGE,
+    __SUS_STAGE,
+    __IDL_STAGE
   };
 
   int stage_tm1;

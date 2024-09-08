@@ -8,18 +8,18 @@
 class FilterModule : public Module {
  public:
   enum FilterParam : int {
-    freq_cut_t,
-    freq_cut_mod_amt_t,
-    res_t,
-    res_mod_amt_t
+    __FREQ_CUT,
+    __FREQ_CUT_MOD_AMT,
+    __RES,
+    __RES_MOD_AMT
   };
   enum FilterInPort : int {
-    freq_cut_mod_t,
-    res_mod_t,
-    in_t
+    __FREQ_CUT_MOD,
+    __RES_MOD,
+    __IN
   };
   enum FilterOutPort : int {
-    out_t
+    __OUT
   };
 
   FilterModule(double freq_sample);

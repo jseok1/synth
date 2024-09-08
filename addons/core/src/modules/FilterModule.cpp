@@ -5,16 +5,16 @@
 
 FilterModule::FilterModule(double freq_sample)
   : Module{freq_sample, {
-      {FilterParam::freq_cut_t, 20.0},
-      {FilterParam::freq_cut_mod_amt_t, 0.0},
-      {FilterParam::res_t, 0.0},
-      {FilterParam::res_mod_amt_t, 0.0}
+      {FilterParam::__FREQ_CUT, 20.0},
+      {FilterParam::__FREQ_CUT_MOD_AMT, 0.0},
+      {FilterParam::__RES, 0.0},
+      {FilterParam::__RES_MOD_AMT, 0.0}
     }, {
-      {FilterInPort::freq_cut_mod_t, InPort{0.0, false}},
-      {FilterInPort::res_mod_t, InPort{0.0, false}},
-      {FilterInPort::in_t, InPort{0.0, false}}
+      {FilterInPort::__FREQ_CUT_MOD, InPort{0.0, false}},
+      {FilterInPort::__RES_MOD, InPort{0.0, false}},
+      {FilterInPort::__IN, InPort{0.0, false}}
     }, {
-      {FilterOutPort::out_t, OutPort{0.0}}
+      {FilterOutPort::__OUT, OutPort{0.0}}
     }},
     in_tm2{0.0},
     in_tm1{0.0},
@@ -25,16 +25,16 @@ FilterModule::FilterModule(double freq_sample)
     hidden_t{0.0} {}
 
 void FilterModule::process() {
-  auto freq_cut_t = params[FilterParam::freq_cut_t];
-  auto freq_cut_mod_amt_t = params[FilterParam::freq_cut_mod_amt_t];
-  auto res_t = params[FilterParam::res_t];
-  auto res_mod_amt_t = params[FilterParam::res_mod_amt_t];
+  auto freq_cut_t = params[FilterParam::__FREQ_CUT];
+  auto freq_cut_mod_amt_t = params[FilterParam::__FREQ_CUT_MOD_AMT];
+  auto res_t = params[FilterParam::__RES];
+  auto res_mod_amt_t = params[FilterParam::__RES_MOD_AMT];
 
-  auto freq_cut_mod_t = in_ports[FilterInPort::freq_cut_mod_t].volt;
-  auto res_mod_t = in_ports[FilterInPort::res_mod_t].volt;
-  auto in_t = in_ports[FilterInPort::in_t].volt;
+  auto freq_cut_mod_t = in_ports[FilterInPort::__FREQ_CUT_MOD].volt;
+  auto res_mod_t = in_ports[FilterInPort::__RES_MOD].volt;
+  auto in_t = in_ports[FilterInPort::__IN].volt;
 
-  auto &out_t = out_ports[FilterOutPort::out_t].volt;
+  auto &out_t = out_ports[FilterOutPort::__OUT].volt;
 
   out_tm2 = out_tm1;
   out_tm1 = out_t;

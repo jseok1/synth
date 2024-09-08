@@ -10,7 +10,7 @@ class ToDeviceModule : public Module {
   enum ToDeviceParam : int {
   };
   enum ToDeviceInPort : int {
-    in_t
+    __IN
   };
   enum ToDeviceOutPort : int {
   };

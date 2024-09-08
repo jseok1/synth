@@ -4,24 +4,24 @@
 
 AmplifierModule::AmplifierModule(double freq_sample)
   : Module{freq_sample, {
-      {AmplifierParam::amp_mod_amt_t, 1.0}
+      {AmplifierParam::__AMP_MOD_AMT, 1.0}
     }, {
-      {AmplifierInPort::amp_mod_t, InPort{0.0, false}},
-      {AmplifierInPort::in_t, InPort{0.0, false}}
+      {AmplifierInPort::__AMP_MOD, InPort{0.0, false}},
+      {AmplifierInPort::__IN, InPort{0.0, false}}
     }, {
-      {AmplifierOutPort::out_t, OutPort{0.0}}
+      {AmplifierOutPort::__OUT, OutPort{0.0}}
     }} {}
 
 void AmplifierModule::process() {
   auto amp_t = 0.0;
-  auto amp_mod_amt_t = params[AmplifierParam::amp_mod_amt_t];
+  auto amp_mod_amt_t = params[AmplifierParam::__AMP_MOD_AMT];
 
-  auto amp_mod_t = in_ports[AmplifierInPort::amp_mod_t].volt;
-  auto in_t = in_ports[AmplifierInPort::in_t].volt;
+  auto amp_mod_t = in_ports[AmplifierInPort::__AMP_MOD].volt;
+  auto in_t = in_ports[AmplifierInPort::__IN].volt;
 
-  auto &out_t = out_ports[AmplifierOutPort::out_t].volt;
+  auto &out_t = out_ports[AmplifierOutPort::__OUT].volt;
 
-  if (!in_ports[AmplifierInPort::amp_mod_t].is_connected) {
+  if (!in_ports[AmplifierInPort::__AMP_MOD].is_connected) {
     amp_mod_t = 1.0;
   }
 

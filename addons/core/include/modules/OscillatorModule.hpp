@@ -8,23 +8,23 @@
 class OscillatorModule : public Module {
  public:
   enum OscillatorParam : int {
-    freq_t,
-    freq_mod_amt_t,
-    pul_width_t,
-    pul_width_mod_amt_t
+    __FREQ,
+    __FREQ_MOD_AMT,
+    __PUL_WIDTH,
+    __PUL_WIDTH_MOD_AMT
   };
   enum OscillatorInPort : int {
-    freq_mod_t,
-    pul_width_mod_t,
-    volt_per_oct_t,
-    sync_t
+    __FREQ_MOD,
+    __PUL_WIDTH_MOD,
+    __VOLT_PER_OCT,
+    __SYNC
   };
   enum OscillatorOutPort : int {
-    sin_t,
-    tri_t,
-    saw_t,
-    sqr_t,
-    pul_t
+    __SIN,
+    __TRI,
+    __SAW,
+    __SQR,
+    __PUL
   };
 
   OscillatorModule(double freq_sample);

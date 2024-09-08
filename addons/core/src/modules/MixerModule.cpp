@@ -6,22 +6,22 @@
 
 // void MixerModule::process() {
 //   auto amp_1_t = 0.0;
-//   auto amp_mod_amt_1_t = params[MixerParam::amp_mod_amt_1_t];
+//   auto amp_mod_amt_1_t = params[MixerParam::__AMP_MOD_AMT_1];
 //   auto amp_2_t = 0.0;
-//   auto amp_mod_amt_2_t = params[MixerParam::amp_mod_amt_2_t];
+//   auto amp_mod_amt_2_t = params[MixerParam::__AMP_MOD_AMT_2];
 //   auto amp_3_t = 0.0;
-//   auto amp_mod_amt_3_t = params[MixerParam::amp_mod_amt_3_t];
+//   auto amp_mod_amt_3_t = params[MixerParam::__AMP_MOD_AMT_3];
 //   auto amp_4_t = 0.0;
-//   auto amp_mod_amt_4_t = params[MixerParam::amp_mod_amt_4_t];
+//   auto amp_mod_amt_4_t = params[MixerParam::__AMP_MOD_AMT_4];
 
 //   auto amp_mod_1_t = 1.0;
-//   auto in_1_t = in_ports[MixerInPort::in_1_t];
+//   auto in_1_t = in_ports[MixerInPort::__IN_1];
 //   auto amp_mod_2_t = 1.0;
-//   auto in_2_t = in_ports[MixerInPort::in_2_t];
+//   auto in_2_t = in_ports[MixerInPort::__IN_2];
 //   auto amp_mod_3_t = 1.0;
-//   auto in_3_t = in_ports[MixerInPort::in_3_t];
+//   auto in_3_t = in_ports[MixerInPort::__IN_3];
 //   auto amp_mod_4_t = 1.0;
-//   auto in_4_t = in_ports[MixerInPort::in_4_t];
+//   auto in_4_t = in_ports[MixerInPort::__IN_4];
 
 //   auto &out_t = out_ports[MixerOutPort::out_t];
 

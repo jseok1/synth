@@ -6,48 +6,48 @@
 
 EnvelopeModule::EnvelopeModule(double freq_sample)
   : Module{freq_sample, {
-      {EnvelopeParam::att_t, 0.0},
-      {EnvelopeParam::att_mod_amt_t, 0.0},
-      {EnvelopeParam::dec_t, 0.0},
-      {EnvelopeParam::dec_mod_amt_t, 0.0},
-      {EnvelopeParam::sus_t, 0.0},
-      {EnvelopeParam::sus_mod_amt_t, 0.0},
-      {EnvelopeParam::rel_t, 0.0},
-      {EnvelopeParam::rel_mod_amt_t, 0.0}
+      {EnvelopeParam::__ATT, 0.0},
+      {EnvelopeParam::__ATT_MOD_AMT, 0.0},
+      {EnvelopeParam::__DEC, 0.0},
+      {EnvelopeParam::__DEC_MOD_AMT, 0.0},
+      {EnvelopeParam::__SUS, 0.0},
+      {EnvelopeParam::__SUS_MOD_AMT, 0.0},
+      {EnvelopeParam::__REL, 0.0},
+      {EnvelopeParam::__REL_MOD_AMT, 0.0}
     }, {
-      {EnvelopeInPort::att_mod_t, InPort{0.0, false}},
-      {EnvelopeInPort::dec_mod_t, InPort{0.0, false}},
-      {EnvelopeInPort::sus_mod_t, InPort{0.0, false}},
-      {EnvelopeInPort::rel_mod_t, InPort{0.0, false}},
-      {EnvelopeInPort::gate_t, InPort{0.0, false}},
-      {EnvelopeInPort::retr_t, InPort{0.0, false}}
+      {EnvelopeInPort::__ATT_MOD, InPort{0.0, false}},
+      {EnvelopeInPort::__DEC_MOD, InPort{0.0, false}},
+      {EnvelopeInPort::__SUS_MOD, InPort{0.0, false}},
+      {EnvelopeInPort::__REL_MOD, InPort{0.0, false}},
+      {EnvelopeInPort::__GATE, InPort{0.0, false}},
+      {EnvelopeInPort::__RETR, InPort{0.0, false}}
     }, {
-      {EnvelopeOutPort::env_t, OutPort{0.0}}
+      {EnvelopeOutPort::__ENV, OutPort{0.0}}
     }},
-    stage_tm1{EnvelopeStage::idl},
+    stage_tm1{EnvelopeStage::__IDL_STAGE},
     sus_tm1{0.0},
     gate_tm1{0.0},
     retr_tm1{0.0},
     env_tm1{0.0} {}
 
 void EnvelopeModule::process() {
-  auto att_t = params[EnvelopeParam::att_t];
-  auto att_mod_amt_t = params[EnvelopeParam::att_mod_amt_t];
-  auto dec_t = params[EnvelopeParam::dec_t];
-  auto dec_mod_amt_t = params[EnvelopeParam::dec_mod_amt_t];
-  auto sus_t = params[EnvelopeParam::sus_t];
-  auto sus_mod_amt_t = params[EnvelopeParam::sus_mod_amt_t];
-  auto rel_t = params[EnvelopeParam::rel_t];
-  auto rel_mod_amt_t = params[EnvelopeParam::rel_mod_amt_t];
+  auto att_t = params[EnvelopeParam::__ATT];
+  auto att_mod_amt_t = params[EnvelopeParam::__ATT_MOD_AMT];
+  auto dec_t = params[EnvelopeParam::__DEC];
+  auto dec_mod_amt_t = params[EnvelopeParam::__DEC_MOD_AMT];
+  auto sus_t = params[EnvelopeParam::__SUS];
+  auto sus_mod_amt_t = params[EnvelopeParam::__SUS_MOD_AMT];
+  auto rel_t = params[EnvelopeParam::__REL];
+  auto rel_mod_amt_t = params[EnvelopeParam::__REL_MOD_AMT];
 
-  auto att_mod_t = in_ports[EnvelopeInPort::att_mod_t].volt;
-  auto dec_mod_t = in_ports[EnvelopeInPort::dec_mod_t].volt;
-  auto sus_mod_t = in_ports[EnvelopeInPort::sus_mod_t].volt;
-  auto rel_mod_t = in_ports[EnvelopeInPort::rel_mod_t].volt;
-  auto gate_t = in_ports[EnvelopeInPort::gate_t].volt;
-  auto retr_t = in_ports[EnvelopeInPort::retr_t].volt;
+  auto att_mod_t = in_ports[EnvelopeInPort::__ATT_MOD].volt;
+  auto dec_mod_t = in_ports[EnvelopeInPort::__DEC_MOD].volt;
+  auto sus_mod_t = in_ports[EnvelopeInPort::__SUS_MOD].volt;
+  auto rel_mod_t = in_ports[EnvelopeInPort::__REL_MOD].volt;
+  auto gate_t = in_ports[EnvelopeInPort::__GATE].volt;
+  auto retr_t = in_ports[EnvelopeInPort::__RETR].volt;
 
-  auto &env_t = out_ports[EnvelopeOutPort::env_t].volt;
+  auto &env_t = out_ports[EnvelopeOutPort::__ENV].volt;
 
   env_tm1 = env_t;
 
@@ -63,24 +63,24 @@ void EnvelopeModule::process() {
 
   int stage_t;
   switch (stage_tm1) {
-    case EnvelopeStage::att: {
-      stage_t = env_tm1 == 1 ? EnvelopeStage::dec : EnvelopeStage::att;
+    case EnvelopeStage::__ATT_STAGE: {
+      stage_t = env_tm1 == 1 ? EnvelopeStage::__DEC_STAGE : EnvelopeStage::__ATT_STAGE;
       break;
     }
-    case EnvelopeStage::dec: {
-      stage_t = env_tm1 == sus_tm1 ? EnvelopeStage::sus : EnvelopeStage::dec;
+    case EnvelopeStage::__DEC_STAGE: {
+      stage_t = env_tm1 == sus_tm1 ? EnvelopeStage::__SUS_STAGE : EnvelopeStage::__DEC_STAGE;
       break;
     }
-    case EnvelopeStage::sus: {
-      stage_t = EnvelopeStage::sus;
+    case EnvelopeStage::__SUS_STAGE: {
+      stage_t = EnvelopeStage::__SUS_STAGE;
       break;
     }
-    case EnvelopeStage::rel: {
-      stage_t = env_tm1 == 0 ? EnvelopeStage::idl : EnvelopeStage::rel;
+    case EnvelopeStage::__REL_STAGE: {
+      stage_t = env_tm1 == 0 ? EnvelopeStage::__IDL_STAGE : EnvelopeStage::__REL_STAGE;
       break;
     }
-    case EnvelopeStage::idl: {
-      stage_t = EnvelopeStage::idl;
+    case EnvelopeStage::__IDL_STAGE: {
+      stage_t = EnvelopeStage::__IDL_STAGE;
       break;
     }
     default: {
@@ -89,10 +89,10 @@ void EnvelopeModule::process() {
   }
 
   if (!gate_tm1 && gate_t || !retr_tm1 && retr_t) {
-    stage_t = EnvelopeStage::att;
+    stage_t = EnvelopeStage::__ATT_STAGE;
   }
   if (gate_tm1 && !gate_t) {
-    stage_t = EnvelopeStage::rel;
+    stage_t = EnvelopeStage::__REL_STAGE;
   }
 
   env_t = env(env_tm1, stage_t, att_t, dec_t, sus_t, rel_t);
@@ -113,29 +113,29 @@ double EnvelopeModule::env(
 ) {
   double env_t;
   switch (stage_t) {
-    case EnvelopeStage::att: {
+    case EnvelopeStage::__ATT_STAGE: {
       double att_target_t = 1.2;
       double att_rate_t = std::log((att_target_t - 1) / att_target_t) / att_t;
       env_t = std::min((env_tm1 - att_target_t) * std::exp(att_rate_t) + att_target_t, 1.0);
       break;
     }
-    case EnvelopeStage::dec: {
+    case EnvelopeStage::__DEC_STAGE: {
       double dec_target_t = sus_t - 0.001;
       double dec_rate_t = -std::log((dec_target_t - 1) / dec_target_t) / dec_t;
       env_t = std::max((env_tm1 - dec_target_t) * std::exp(dec_rate_t) + dec_target_t, sus_t);
       break;
     }
-    case EnvelopeStage::sus: {
+    case EnvelopeStage::__SUS_STAGE: {
       env_t = sus_t;
       break;
     }
-    case EnvelopeStage::rel: {
+    case EnvelopeStage::__REL_STAGE: {
       double rel_target_t = -0.001;
       double rel_rate_t = -std::log((rel_target_t - 1) / rel_target_t) / rel_t;
       env_t = std::max((env_tm1 - rel_target_t) * std::exp(rel_rate_t) + rel_target_t, 0.0);
       break;
     }
-    case EnvelopeStage::idl: {
+    case EnvelopeStage::__IDL_STAGE: {
       env_t = 0.0;
       break;
     }

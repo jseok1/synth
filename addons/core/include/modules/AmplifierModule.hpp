@@ -8,14 +8,14 @@
 class AmplifierModule : public Module {
  public:
   enum AmplifierParam : int {
-    amp_mod_amt_t
+    __AMP_MOD_AMT
   };
   enum AmplifierInPort : int {
-    amp_mod_t,
-    in_t
+    __AMP_MOD,
+    __IN
   };
   enum AmplifierOutPort : int {
-    out_t
+    __OUT
   };
 
   AmplifierModule(double freq_sample);

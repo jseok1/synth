@@ -7,42 +7,42 @@
 
 OscillatorModule::OscillatorModule(double freq_sample)
   : Module{freq_sample, {
-      {OscillatorParam::freq_t, 8.175799 * std::pow(2, 2)},  // 32': 2, 16': 3, 8': 4, 4': 5, 2': 6
-      {OscillatorParam::freq_mod_amt_t, 0.0},
-      {OscillatorParam::pul_width_t, 0.5},
-      {OscillatorParam::pul_width_mod_amt_t, 0.0}
+      {OscillatorParam::__FREQ, 8.175799 * std::pow(2, 2)},  // 32': 2, 16': 3, 8': 4, 4': 5, 2': 6
+      {OscillatorParam::__FREQ_MOD_AMT, 0.0},
+      {OscillatorParam::__PUL_WIDTH, 0.5},
+      {OscillatorParam::__PUL_WIDTH_MOD_AMT, 0.0}
     }, {
-      {OscillatorInPort::freq_mod_t, InPort{0.0, false}},
-      {OscillatorInPort::pul_width_mod_t, InPort{0.0, false}},
-      {OscillatorInPort::volt_per_oct_t, InPort{0.0, false}},
-      {OscillatorInPort::sync_t, InPort{0.0, false}}
+      {OscillatorInPort::__FREQ_MOD, InPort{0.0, false}},
+      {OscillatorInPort::__PUL_WIDTH_MOD, InPort{0.0, false}},
+      {OscillatorInPort::__VOLT_PER_OCT, InPort{0.0, false}},
+      {OscillatorInPort::__SYNC, InPort{0.0, false}}
     }, {
-      {OscillatorOutPort::sin_t, OutPort{0.0}},
-      {OscillatorOutPort::tri_t, OutPort{0.0}},
-      {OscillatorOutPort::saw_t, OutPort{0.0}},
-      {OscillatorOutPort::sqr_t, OutPort{0.0}},
-      {OscillatorOutPort::pul_t, OutPort{0.0}}
+      {OscillatorOutPort::__SIN, OutPort{0.0}},
+      {OscillatorOutPort::__TRI, OutPort{0.0}},
+      {OscillatorOutPort::__SAW, OutPort{0.0}},
+      {OscillatorOutPort::__SQR, OutPort{0.0}},
+      {OscillatorOutPort::__PUL, OutPort{0.0}}
     }},
     phase_tm1{0.0},
     sync_tm1{0.0},
     freq_tm1{0.0} {}
 
 void OscillatorModule::process() {
-  auto freq_t = params[OscillatorParam::freq_t];
-  auto freq_mod_amt_t = params[OscillatorParam::freq_mod_amt_t];
-  auto pul_width_t = params[OscillatorParam::pul_width_t];
-  auto pul_width_mod_amt_t = params[OscillatorParam::pul_width_mod_amt_t];
+  auto freq_t = params[OscillatorParam::__FREQ];
+  auto freq_mod_amt_t = params[OscillatorParam::__FREQ_MOD_AMT];
+  auto pul_width_t = params[OscillatorParam::__PUL_WIDTH];
+  auto pul_width_mod_amt_t = params[OscillatorParam::__PUL_WIDTH_MOD_AMT];
 
-  auto freq_mod_t = in_ports[OscillatorInPort::freq_mod_t].volt;
-  auto pul_width_mod_t = in_ports[OscillatorInPort::pul_width_mod_t].volt;
-  auto volt_per_oct_t = in_ports[OscillatorInPort::volt_per_oct_t].volt;
-  auto sync_t = in_ports[OscillatorInPort::sync_t].volt;
+  auto freq_mod_t = in_ports[OscillatorInPort::__FREQ_MOD].volt;
+  auto pul_width_mod_t = in_ports[OscillatorInPort::__PUL_WIDTH_MOD].volt;
+  auto volt_per_oct_t = in_ports[OscillatorInPort::__VOLT_PER_OCT].volt;
+  auto sync_t = in_ports[OscillatorInPort::__SYNC].volt;
 
-  auto& sin_t = out_ports[OscillatorOutPort::sin_t].volt;
-  auto& tri_t = out_ports[OscillatorOutPort::tri_t].volt;
-  auto& saw_t = out_ports[OscillatorOutPort::saw_t].volt;
-  auto& sqr_t = out_ports[OscillatorOutPort::sqr_t].volt;
-  auto& pul_t = out_ports[OscillatorOutPort::pul_t].volt;
+  auto& sin_t = out_ports[OscillatorOutPort::__SIN].volt;
+  auto& tri_t = out_ports[OscillatorOutPort::__TRI].volt;
+  auto& saw_t = out_ports[OscillatorOutPort::__SAW].volt;
+  auto& sqr_t = out_ports[OscillatorOutPort::__SQR].volt;
+  auto& pul_t = out_ports[OscillatorOutPort::__PUL].volt;
 
   if (freq_tm1 != freq_t) {
     auto stop = std::chrono::high_resolution_clock::now();

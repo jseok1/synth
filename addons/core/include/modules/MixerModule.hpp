@@ -8,19 +8,19 @@
 class MixerModule : public Module {
  public:
   enum MixerParam : int {
-    amp_mod_amt_1_t,
-    amp_mod_amt_2_t,
-    amp_mod_amt_3_t,
-    amp_mod_amt_4_t
+    __AMP_MOD_AMT_1,
+    __AMP_MOD_AMT_2,
+    __AMP_MOD_AMT_3,
+    __AMP_MOD_AMT_4
   };
   enum MixerInPort : int {
-    in_1_t,
-    in_2_t,
-    in_3_t,
-    in_4_t
+    __IN_1,
+    __IN_2,
+    __IN_3,
+    __IN_4
   };
   enum MixerOutPort : int {
-    out_t
+    __OUT
   };
 
   MixerModule(double freq_sample);
