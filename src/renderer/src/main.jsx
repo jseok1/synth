@@ -1,19 +1,12 @@
-import "./assets/main.css";
+import "./assets/styles/main.css";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 
-//////////
-api.hello();
-api.addModule(1, 0);
-api.addCable(0, 0, 1, 1);
-api.startStream();
-
 // could try polling?
 window.addEventListener("keydown", function (event) {
   if (event.repeat) return;
-  console.log("key");
   switch (event.code) {
     case "KeyZ":
       api.updateParam(1, 0, 8.175799 * 16 * Math.pow(2, 0 / 12));
@@ -59,7 +52,6 @@ window.addEventListener("keydown", function (event) {
       break;
   }
 });
-///
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

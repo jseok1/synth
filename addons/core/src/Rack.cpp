@@ -33,7 +33,7 @@ double Rack::process() {
     modules[in_module_id]->process();
   }
 
-  return to_device_module_id > 0 ? modules[to_device_module_id]->in_ports[0].volt : 0.0;
+  return to_device_module_id >= 0 ? modules[to_device_module_id]->in_ports[0].volt : 0.0;
 }
 
 void Rack::add_module(int module_id, std::shared_ptr<Module> module) {

@@ -9,7 +9,7 @@ OscillatorModule::OscillatorModule(double freq_sample)
   : Module{freq_sample, {
       {OscillatorParam::freq_t, 8.175799 * std::pow(2, 2)},  // 32': 2, 16': 3, 8': 4, 4': 5, 2': 6
       {OscillatorParam::freq_mod_amt_t, 0.0},
-      {OscillatorParam::pul_width_t, 0.0},
+      {OscillatorParam::pul_width_t, 0.5},
       {OscillatorParam::pul_width_mod_amt_t, 0.0}
     }, {
       {OscillatorInPort::freq_mod_t, InPort{0.0, false}},
