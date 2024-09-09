@@ -6,8 +6,24 @@
 #include <iostream>
 #include <thread>
 
-#include "modules/OscillatorModule.hpp"
 #include "Rack.hpp"
+#include "modules/ToDeviceModule.hpp"
+#include "modules/FromDeviceModule.hpp"
+#include "modules/OscillatorModule.hpp"
+#include "modules/EnvelopeModule.hpp"
+#include "modules/FilterModule.hpp"
+#include "modules/AmplifierModule.hpp"
+#include "modules/MixerModule.hpp"
+
+enum ModuleType : int {
+  __TO_DEVICE,
+  __FROM_DEVICE,
+  __OSCILLATOR,
+  __ENVELOPE,
+  __FILTER,
+  __AMPLIFIER,
+  __MIXER
+};
 
 const double freq_sample = 44100;
 const unsigned long sample_size = 256;
@@ -69,12 +85,20 @@ void StartStream(const Napi::CallbackInfo &args) {
     outputParameters.device = Pa_GetDefaultOutputDevice();
     outputParameters.channelCount = 1;
     outputParameters.sampleFormat = paFloat32;
-    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
+    outputParameters.suggestedLatency =
+      Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     std::cout << "Suggested latency: " << outputParameters.suggestedLatency << std::endl;
     err = Pa_OpenStream(
-      &stream, NULL, &outputParameters, freq_sample, sample_size, paClipOff, streamCallback, &userData
+      &stream,
+      NULL,
+      &outputParameters,
+      freq_sample,
+      sample_size,
+      paClipOff,
+      streamCallback,
+      &userData
     );
     if (err != paNoError) {
       Pa_Terminate();
@@ -133,8 +157,32 @@ void AddModule(const Napi::CallbackInfo &args) {
 
   std::shared_ptr<Module> module;
   switch (module_type) {
-    case 0: {
+    case ModuleType::__TO_DEVICE: {
+      module = std::make_shared<ToDeviceModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__FROM_DEVICE: {
+      module = std::make_shared<FromDeviceModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__OSCILLATOR: {
       module = std::make_shared<OscillatorModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__ENVELOPE: {
+      module = std::make_shared<EnvelopeModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__FILTER: {
+      module = std::make_shared<FilterModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__AMPLIFIER: {
+      module = std::make_shared<AmplifierModule>(freq_sample);
+      break;
+    }
+    case ModuleType::__MIXER: {
+      module = std::make_shared<MixerModule>(freq_sample);
       break;
     }
     default: {

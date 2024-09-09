@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -9,12 +10,10 @@
 #include "modules/FromDeviceModule.hpp"
 #include "modules/ToDeviceModule.hpp"
 
-// TODO: hack
+// ToDevice breaks sometimes
+
 Rack::Rack()
-  : sorted_module_ids{}, modules{}, cables{}, from_device_module_id{-1}, to_device_module_id{-1} {
-  add_module(0, std::make_shared<ToDeviceModule>(44100));
-  to_device_module_id = 0;
-}
+  : sorted_module_ids{}, modules{}, cables{}, from_device_module_id{0}, to_device_module_id{0} {}
 
 double Rack::process() {
   for (auto in_module_id : sorted_module_ids) {
@@ -33,17 +32,41 @@ double Rack::process() {
     modules[in_module_id]->process();
   }
 
-  return to_device_module_id >= 0 ? modules[to_device_module_id]->in_ports[0].volt : 0.0;
+  return to_device_module_id
+           ? modules[to_device_module_id]->in_ports[ToDeviceModule::ToDeviceInPort::__IN].volt
+           : 0.0;
 }
 
 void Rack::add_module(int module_id, std::shared_ptr<Module> module) {
+  // TODO: maybe better to find a polymorphic solution?
+  if (std::dynamic_pointer_cast<ToDeviceModule>(module) != nullptr) {
+    if (to_device_module_id) {
+      throw std::invalid_argument("ERROR::RACK::TO_DEVICE_MODULE_ALREADY_EXISTS");
+    }
+    to_device_module_id = module_id;
+  }
+
+  if (std::dynamic_pointer_cast<FromDeviceModule>(module) != nullptr) {
+    if (from_device_module_id) {
+      throw std::invalid_argument("ERROR::RACK::FROM_DEVICE_MODULE_ALREADY_EXISTS");
+    }
+    from_device_module_id = module_id;
+  }
+
   remove_module(module_id);
 
-  // auto copy = modules.val(); // return const reference? think about operation as map and filter?
   modules.insert({module_id, module});
 }
 
 void Rack::remove_module(int module_id) {
+  if (std::dynamic_pointer_cast<ToDeviceModule>(modules[module_id]) != nullptr) {
+    to_device_module_id = 0;
+  }
+
+  if (std::dynamic_pointer_cast<FromDeviceModule>(modules[module_id]) != nullptr) {
+    from_device_module_id = 0;
+  }
+
   modules.erase(module_id);
 
   for (const auto &[in_module_id, in_module] : modules) {

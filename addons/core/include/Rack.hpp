@@ -29,7 +29,7 @@ class Rack {
   std::vector<int> sorted_module_ids;
   std::unordered_map<int, std::shared_ptr<Module>> modules;
   std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Cable>>> cables;
-  int from_device_module_id;
+  int from_device_module_id;  // 0 is RESERVED
   int to_device_module_id;
 
   void sort_modules(int in_module_id, std::unordered_set<int> &visited_module_ids);

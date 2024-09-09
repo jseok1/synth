@@ -1,5 +1,5 @@
-#ifndef OUT_RACK_MODULE
-#define OUT_RACK_MODULE
+#ifndef TO_DEVICE_MODULE
+#define TO_DEVICE_MODULE
 
 #include <unordered_map>
 

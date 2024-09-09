@@ -15,7 +15,7 @@
 body { margin: 0; padding: 0; color: var(--color-black); background-color: var(--color-black); }
 
 * { box-sizing: border-box; }
-.module { background-color: var(--color-grey); border: 2px solid var(--color-medium-grey); padding: 10px; }
+.module { position: absolute; background-color: var(--color-grey); border: 2px solid var(--color-medium-grey); padding: 10px; }
 .module .module-type { width: 100%; padding: 0 0 10px; text-align: center; font-weight: bold; }
 .module .slider { display: flex; flex-direction: column; align-items: center; justify-self: center; }
 .module .slider label { font-size: var(--font-size-xs); }

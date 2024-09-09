@@ -22,6 +22,15 @@ function OscillatorModule(props) {
   [params[__PUL_WIDTH_MOD_AMT], handlers[__PUL_WIDTH_MOD_AMT]] = useState(0.0);
 
   useEffect(() => {
+    console.log(`api.addModule(${moduleId}, __OSCILLATOR);`);
+    api.addModule(moduleId, 2);
+    return () => {
+      console.log(`api.removeModule(${moduleId});`);
+      api.removeModule(moduleId);
+    };
+  }, []);
+
+  useEffect(() => {
     api.updateParam(moduleId, __FREQ, params[__FREQ]);
   }, [params[__FREQ]]);
 
@@ -49,6 +58,7 @@ function OscillatorModule(props) {
         }}
       />
       <div>{params[__FREQ]}</div>
+      <div>{moduleId}</div>
 
       <div className="out">
         <InPort />
