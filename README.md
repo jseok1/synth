@@ -12,10 +12,7 @@
 * Add C++ performance logging.
 * Change shared_ptr to unique_ptr.
 * Think of a good name.
-* synth-sandbox
-* modular-madness
-* rainstorm
-* synth-waves
+* Catenary curves for cables (interesting challenge: model Catenary curves using Bezier).
 
 ## Useful Resources
 https://www.earlevel.com/main/
@@ -28,6 +25,7 @@ https://portaudio.music.columbia.narkive.com/snc4IQsB/multithreading-and-mutexes
 https://www.youtube.com/watch?v=Q0vrQFyAdWI
 https://www.youtube.com/watch?v=PoZAo2Vikbo
 https://stackoverflow.com/questions/23214614/time-between-callback-calls/23226247#23226247
+https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
 
 ## Graph Structure
 Modules and ports with cables form a DAG.

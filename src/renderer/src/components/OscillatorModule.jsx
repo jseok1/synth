@@ -47,24 +47,26 @@ function OscillatorModule(props) {
   }, [params[__PUL_WIDTH_MOD_AMT]]);
 
   return (
-    <div className="module oscillator">
-      <div className="module-type">VCO</div>
-      <Slider
-        label="FREQ"
-        min="0"
-        max="1000"
-        onChange={(event) => {
-          handlers[__FREQ](parseFloat(event.target.value));
-        }}
-      />
-      <div>{params[__FREQ]}</div>
-      <div>{moduleId}</div>
+    <div className="module module-outer oscillator" style={{ top: yCoord, left: xCoord }}>
+      <div className="module-inner">
+        <div className="module-type">VCO</div>
+        <Slider
+          label="FREQ"
+          min="0"
+          max="1000"
+          onChange={(event) => {
+            handlers[__FREQ](parseFloat(event.target.value));
+          }}
+        />
+        <div>{params[__FREQ]}</div>
+        <div>{moduleId}</div>
 
-      <div className="out">
-        <InPort />
-        <InPort />
-        <InPort />
-        <InPort />
+        <div className="out">
+          <InPort xCoord={xCoord} yCoord={yCoord} />
+          <InPort xCoord={xCoord} yCoord={yCoord} />
+          <InPort xCoord={xCoord} yCoord={yCoord} />
+          <InPort xCoord={xCoord} yCoord={yCoord} />
+        </div>
       </div>
     </div>
   );
