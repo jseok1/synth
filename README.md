@@ -14,6 +14,8 @@
 * Think of a good name.
 * Catenary curves for cables (interesting challenge: model Catenary curves using Bezier).
 
+From a variable naming/thinking point of view, inModule vs. outModule is from the context of cables.
+
 ## Useful Resources
 https://www.earlevel.com/main/
 https://dsp.stackexchange.com/questions/2555/help-with-equations-for-exponential-adsr-envelope

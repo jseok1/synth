@@ -2,7 +2,7 @@ import "../assets/styles/OscillatorModule.css";
 
 import { useEffect, useState } from "react";
 import Slider from "./Slider";
-import InPort from "./InPort";
+import { InPort, OutPort } from "./Port";
 
 const __FREQ = 0;
 const __FREQ_MOD_AMT = 1;
@@ -61,11 +61,20 @@ function OscillatorModule(props) {
         <div>{params[__FREQ]}</div>
         <div>{moduleId}</div>
 
-        <div className="out">
-          <InPort xCoord={xCoord} yCoord={yCoord} />
-          <InPort xCoord={xCoord} yCoord={yCoord} />
-          <InPort xCoord={xCoord} yCoord={yCoord} />
-          <InPort xCoord={xCoord} yCoord={yCoord} />
+        <div className="ports">
+          {/* TODO: __IN_PORT_... naming */}
+          <InPort moduleId={moduleId} inPortId={0} inPortLabel="FM" />
+          <InPort moduleId={moduleId} inPortId={1} inPortLabel="PWM" />
+          <InPort moduleId={moduleId} inPortId={2} inPortLabel="V/OCT" />
+          <InPort moduleId={moduleId} inPortId={3} inPortLabel="SYNC" />
+        </div>
+
+        <div className="ports">
+          {/* TODO: __OUT_PORT_... naming */}
+          <OutPort moduleId={moduleId} outPortId={0} outPortLabel="SIN" />
+          <OutPort moduleId={moduleId} outPortId={1} outPortLabel="TRI" />
+          <OutPort moduleId={moduleId} outPortId={2} outPortLabel="SAW" />
+          <OutPort moduleId={moduleId} outPortId={3} outPortLabel="SQR" />
         </div>
       </div>
     </div>

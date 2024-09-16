@@ -1,23 +1,16 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
-#include <unordered_map>
-#include <memory>
 #include <chrono>
+#include <memory>
+#include <unordered_map>
+
+#include "Port.hpp"
 // 1 - IDs. Cables managed by Synth. Just use a set of edges. Runtime wouldn't be the best.
 // But simple. Also Module/Ports don't need to know about their IDs.
 // NEED to copy volt. AND zero out from Synth.
 // 2 - Shared pointer to module in cable. Don't need to copy volt over.
 // Cables sorted in topo order?
-
-struct InPort {
-  double volt;
-  bool is_connected;
-};
-
-struct OutPort {
-  double volt;
-};
 
 class Module {
  public:

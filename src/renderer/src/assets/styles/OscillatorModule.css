@@ -5,8 +5,10 @@
   font-size: 16px;
   user-select: none;
   --color-black: #38383b;
+  --color-white: #fff;
   --color-grey: #e4e4e4;
   --color-medium-grey: #929292;
+  --font-size-xxs: 0.65rem;
   --font-size-xs: 0.75rem;
   --font-size-s: 0.875rem;
   --font-size-m: 1rem;
@@ -31,12 +33,15 @@ body { width: 100vw; height: 100vh; margin: 0; padding: 0; color: var(--color-bl
 
 
 .module.oscillator { width: calc(50px * 4); height: calc(50px * 8); }
-.module.oscillator .out { display: flex; flex-direction: row; align-items: center; justify-content: space-around; }
 
 svg { width: 100%; height: 100%; pointer-events: none; }
-.port { width: 30px; height: 30px; }
 .cable { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-
+.ports { display: flex; flex-direction: row; align-items: center; justify-content: space-between; }
+.port { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 40px; padding: 2.5px; border-radius: 10px; }
+.port * { pointer-events: none; }
+.port.out-port { background-color: var(--color-black); color: var(--color-white); }
+.port-icon { width: 30px; height: 30px; margin-bottom: 2.5px; }
+.port-label { font-size: var(--font-size-xxs); padding: 2.5px; }
 
 .module-outer { position: absolute; }
 .module-inner { position: relative; }
