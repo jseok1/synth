@@ -15,10 +15,12 @@ const __AMPLIFIER = 5;
 const __MIXER = 6;
 
 function Rack() {
+  // one key idea --> tie creation and deletion of modules/cables to component lifecycle
+
   const [modules, setModules] = useState({});
   const [cables, setCables] = useState({});
   // let draggingModuleId = null;
-  let activeCable = {}; // synchronous version of state
+  let activeCable = {}; // synchronous version of state (in module + port identify cable, must also identify which head is being moved)
 
   // for dragging
   let oldXCoord = 0;
@@ -28,12 +30,21 @@ function Rack() {
     setModules((modules) => {
       let moduleId;
       do {
-        moduleId = Math.floor(Math.random() * 10000) + 1;
+        moduleId = Math.floor(Math.random() * 1000) + 1;
       } while (moduleId in modules);
 
       const module = { moduleId, moduleType };
       modules = { ...modules };
       modules[moduleId] = module;
+
+      return modules;
+    });
+  }
+
+  function removeModule(moduleId) {
+    setModules((modules) => {
+      modules = { ...modules };
+      delete modules[moduleId];
 
       return modules;
     });
@@ -60,7 +71,7 @@ function Rack() {
         outXCoord,
         outYCoord,
       };
-      console.log(inModuleId, inPortId);
+
       cables = { ...cables };
       if (!cables[inModuleId]) cables[inModuleId] = {};
       cables[inModuleId][inPortId] = cable;
@@ -95,7 +106,7 @@ function Rack() {
     let xCoord = 0;
     let yCoord = 0;
 
-    while (!element.classList.contains("rack")) {
+    while (!element.classList.contains("rack-inner")) {
       // TODO: padding, margin, border, outline
       // includes padding but not border
       const { borderLeftWidth, borderTopWidth } = getComputedStyle(element);
@@ -118,10 +129,13 @@ function Rack() {
       xCoord += inPort.querySelector(".port-icon").offsetWidth / 2;
       yCoord += inPort.querySelector(".port-icon").offsetHeight / 2;
 
+      const rack = inPort.closest(".rack-inner");
+
       // TODO: think about whether data-module-id or data-in-module-id makes more sense
       let { moduleId: inModuleId, inPortId } = inPort.dataset;
       inModuleId = parseInt(inModuleId);
       inPortId = parseInt(inPortId);
+      // clientX, clientY are relative to viewport while xCoord, yCoord is relative to rack!
       addCable(inModuleId, inPortId, null, null, xCoord, yCoord, event.clientX, event.clientY);
       activeCable = {
         inModuleId,
@@ -133,7 +147,6 @@ function Rack() {
       };
 
       // actually maybe it's fine to set via state since you're still recording the old coords here
-      const rack = inPort.closest(".rack");
       rack.onmousemove = handleMouseMove;
       rack.onmouseup = handleMouseUp;
 
@@ -203,7 +216,7 @@ function Rack() {
       console.log(inModuleId, inPortId, outModuleId, outPortId);
       updateCable(inModuleId, inPortId, { outModuleId, outPortId, outXCoord, outYCoord });
 
-      const rack = event.target.closest(".rack");
+      const rack = event.target.closest(".rack-inner");
       rack.onmousemove = null;
       rack.onmouseup = null;
 
@@ -218,10 +231,8 @@ function Rack() {
   // CABLES =====
 
   return (
-    <>
-      <button onClick={() => addModule(__TO_DEVICE)}>TO DEVICE</button>
-      <button onClick={() => addModule(__OSCILLATOR)}>VCO</button>
-      <div className="rack" onMouseDown={handleMouseDown}>
+    <div className="rack-outer">
+      <div className="rack-inner" onMouseDown={handleMouseDown}>
         {Object.values(modules).map((module, i) => {
           const { moduleId, moduleType } = module;
           const props = {
@@ -263,6 +274,10 @@ function Rack() {
                 outYCoord,
               } = cable;
               const props = {
+                inModuleId,
+                inPortId,
+                outModuleId,
+                outPortId,
                 inXCoord,
                 inYCoord,
                 outXCoord,
@@ -295,7 +310,11 @@ function Rack() {
           ></div>
         </div>
       </div>
-    </>
+      <div className="rack-widget">
+        <button onClick={() => addModule(__TO_DEVICE)}>TO DEVICE</button>
+        <button onClick={() => addModule(__OSCILLATOR)}>VCO</button>
+      </div>
+    </div>
   );
 }
 

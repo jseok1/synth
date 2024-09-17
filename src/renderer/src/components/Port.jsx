@@ -1,5 +1,5 @@
 function InPort(props) {
-  const { moduleId, inPortId, inPortLabel } = props;
+  const { moduleId, inPortId, label } = props;
 
   // edit <g>
   return (
@@ -11,13 +11,13 @@ function InPort(props) {
           <circle cx="50" cy="50" r="25" fill="#38383b" />
         </svg>
       </div>
-      <div className="port-label">{inPortLabel}</div>
+      <div className="port-label">{label}</div>
     </div>
   );
 }
 
 function OutPort(props) {
-  const { moduleId, outPortId, outPortLabel } = props;
+  const { moduleId, outPortId, label } = props;
 
   // edit <g>
   return (
@@ -29,7 +29,7 @@ function OutPort(props) {
           <circle cx="50" cy="50" r="25" fill="#38383b" />
         </svg>
       </div>
-      <div className="port-label">{outPortLabel}</div>
+      <div className="port-label">{label}</div>
     </div>
   );
 }

@@ -22,10 +22,10 @@ function OscillatorModule(props) {
   [params[__PUL_WIDTH_MOD_AMT], handlers[__PUL_WIDTH_MOD_AMT]] = useState(0.0);
 
   useEffect(() => {
-    console.log(`api.addModule(${moduleId}, __OSCILLATOR);`);
+    console.log(`api.addModule(moduleId: ${moduleId}, moduleType: __OSCILLATOR);`);
     api.addModule(moduleId, 2);
     return () => {
-      console.log(`api.removeModule(${moduleId});`);
+      console.log(`api.removeModule(moduleId: ${moduleId});`);
       api.removeModule(moduleId);
     };
   }, []);
@@ -52,8 +52,9 @@ function OscillatorModule(props) {
         <div className="module-type">VCO</div>
         <Slider
           label="FREQ"
-          min="0"
-          max="1000"
+          min={0}
+          max={1000}
+          value={params[__FREQ]}
           onChange={(event) => {
             handlers[__FREQ](parseFloat(event.target.value));
           }}
@@ -63,18 +64,18 @@ function OscillatorModule(props) {
 
         <div className="ports">
           {/* TODO: __IN_PORT_... naming */}
-          <InPort moduleId={moduleId} inPortId={0} inPortLabel="FM" />
-          <InPort moduleId={moduleId} inPortId={1} inPortLabel="PWM" />
-          <InPort moduleId={moduleId} inPortId={2} inPortLabel="V/OCT" />
-          <InPort moduleId={moduleId} inPortId={3} inPortLabel="SYNC" />
+          <InPort moduleId={moduleId} inPortId={0} label="FM" />
+          <InPort moduleId={moduleId} inPortId={1} label="PWM" />
+          <InPort moduleId={moduleId} inPortId={2} label="V/OCT" />
+          <InPort moduleId={moduleId} inPortId={3} label="SYNC" />
         </div>
 
         <div className="ports">
           {/* TODO: __OUT_PORT_... naming */}
-          <OutPort moduleId={moduleId} outPortId={0} outPortLabel="SIN" />
-          <OutPort moduleId={moduleId} outPortId={1} outPortLabel="TRI" />
-          <OutPort moduleId={moduleId} outPortId={2} outPortLabel="SAW" />
-          <OutPort moduleId={moduleId} outPortId={3} outPortLabel="SQR" />
+          <OutPort moduleId={moduleId} outPortId={0} label="SIN" />
+          <OutPort moduleId={moduleId} outPortId={1} label="TRI" />
+          <OutPort moduleId={moduleId} outPortId={2} label="SAW" />
+          <OutPort moduleId={moduleId} outPortId={3} label="SQR" />
         </div>
       </div>
     </div>

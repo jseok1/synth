@@ -16,6 +16,9 @@
 
 From a variable naming/thinking point of view, inModule vs. outModule is from the context of cables.
 
+There are two entities managed by the rack: modules and cables.
+From the React side, the creation and deletion of modules and cables are tied to component lifecycles, namely through effects. Therefore, the React side never had to know anything about the logic of the application.
+
 ## Useful Resources
 https://www.earlevel.com/main/
 https://dsp.stackexchange.com/questions/2555/help-with-equations-for-exponential-adsr-envelope

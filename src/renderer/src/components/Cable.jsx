@@ -1,18 +1,32 @@
-function Cable(props) {
-  const { inXCoord, inYCoord, outXCoord, outYCoord } = props;
+import { useEffect } from "react";
 
-  // sliders are integral, so *100 then / 100 to get 2 decimals of precision
+function Cable(props) {
+  const { inModuleId, inPortId, outModuleId, outPortId, inXCoord, inYCoord, outXCoord, outYCoord } =
+    props;
+
+  useEffect(() => {
+    if (inModuleId !== null && inPortId !== null && outModuleId !== null && outPortId !== null) {
+      console.log(
+        `api.addCable(inModuleId: ${inModuleId}, inPortId: ${inPortId}, outModuleId: ${outModuleId}, outPortId: ${outPortId});`
+      );
+      api.addCable(inModuleId, inPortId, outModuleId, outPortId);
+      return () => {
+        console.log(`api.removeCable(inModuleId: ${inModuleId}, inPortId: ${inPortId});`);
+        api.removeCable(inModuleId, inPortId);
+      };
+    }
+  }, [inModuleId, inPortId, outModuleId, outPortId]);
 
   const xRange = inXCoord - outXCoord;
   const yRange = Math.abs(inYCoord - outYCoord);
 
   const xAdjust = xRange * 0.2;
-  const yAdjust = xRange * 0.2 + yRange * 0.2; // TODO: play around with weights
+  const yAdjust = Math.abs(xRange) * 0.2 + yRange * 0.2; // TODO: play around with weights
 
   const inXCoordControl = inXCoord - xAdjust;
-  let inYCoordControl = inYCoord - yAdjust;
+  let inYCoordControl = inYCoord + yAdjust;
   const outXCoordControl = outXCoord + xAdjust;
-  let outYCoordControl = outYCoord - yAdjust;
+  let outYCoordControl = outYCoord + yAdjust;
   inYCoordControl = Math.max(inYCoordControl, outYCoordControl);
   outYCoordControl = inYCoordControl;
   // edit <g>

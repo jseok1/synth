@@ -7,10 +7,10 @@ function ToDeviceModule(props) {
   const { moduleId, xCoord, yCoord } = props;
 
   useEffect(() => {
-    console.log(`api.addModule(${moduleId}, __TO_DEVICE);`);
+    console.log(`api.addModule(moduleId: ${moduleId}, moduleType: __TO_DEVICE);`);
     api.addModule(moduleId, 0);
     return () => {
-      console.log(`api.removeModule(${moduleId});`);
+      console.log(`api.removeModule(moduleId: ${moduleId});`);
       api.removeModule(moduleId);
     };
   }, []);
