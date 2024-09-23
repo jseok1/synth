@@ -16,12 +16,14 @@ function ToDeviceModule(props) {
   }, []);
 
   return (
-    <div className="module to-device">
-      <div className="module-type">TO DEVICE</div>
-      <div>{moduleId}</div>
+    <div className="module module-outer to-device" style={{ top: yCoord, left: xCoord }}>
+      <div className="module-inner">
+        <div className="module-type">TO DEVICE</div>
+        <div>{moduleId}</div>
 
-      <div className="out">
-        <InPort />
+        <div className="ports">
+          <InPort moduleId={moduleId} inPortId={0} label="AUDIO" />
+        </div>
       </div>
     </div>
   );

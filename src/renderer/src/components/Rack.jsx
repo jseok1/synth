@@ -1,6 +1,6 @@
 import "../assets/styles/Rack.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import ToDeviceModule from "./modules/ToDeviceModule";
 import OscillatorModule from "./modules/OscillatorModule";
@@ -14,11 +14,29 @@ const __FILTER = 4;
 const __AMPLIFIER = 5;
 const __MIXER = 6;
 
+// function reducer(state, action) {
+//   switch (action.type) {
+//     case "__MODULE.ADD":
+//       break;
+//     case "__MODULE.REMOVE":
+//       break;
+//     case "__MODULE":
+//       br
+//   }
+// }
+
 function Rack() {
   // one key idea --> tie creation and deletion of modules/cables to component lifecycle
 
+  // const [state, dispatch] = useReducer(reducer, {
+  //   modules: {},
+  //   cables: {},
+  //   dragging: { moduleId: null, cableId: null },
+  // });
+
   const [modules, setModules] = useState({ placing: {}, placed: {} });
   const [cables, setCables] = useState({ placing: {}, placed: {} });
+  const [dragging, setDragging] = useState({ modules: [], cables: [] });
 
   // for dragging (Can this be not state?)
   let oldXCoord = 0;
@@ -84,6 +102,8 @@ function Rack() {
       return cables;
     });
   }
+
+  function updateCable(cableId, args) {}
 
   function removeCable(cableId) {
     setCables((cables) => {
@@ -169,18 +189,15 @@ function Rack() {
         );
       }
       if (port.classList.contains("out-port")) {
-        setCables((cables) =>
-          addCable(
-            cables,
-            null,
-            null,
-            parseInt(port.dataset.moduleId),
-            parseInt(port.dataset.outPortId),
-            event.clientX,
-            event.clientY,
-            xCoord,
-            yCoord
-          )
+        addCable(
+          null,
+          null,
+          parseInt(port.dataset.moduleId),
+          parseInt(port.dataset.outPortId),
+          event.clientX,
+          event.clientY,
+          xCoord,
+          yCoord
         );
       }
 
