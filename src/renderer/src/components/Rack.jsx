@@ -2,8 +2,8 @@ import "../assets/styles/Rack.css";
 
 import { useEffect, useState } from "react";
 
-import ToDeviceModule from "./ToDeviceModule";
-import OscillatorModule from "./OscillatorModule";
+import ToDeviceModule from "./modules/ToDeviceModule";
+import OscillatorModule from "./modules/OscillatorModule";
 import Cable from "./Cable";
 
 const __TO_DEVICE = 0;
@@ -17,35 +17,36 @@ const __MIXER = 6;
 function Rack() {
   // one key idea --> tie creation and deletion of modules/cables to component lifecycle
 
-  const [modules, setModules] = useState({});
-  const [cables, setCables] = useState({});
-  // let draggingModuleId = null;
-  let activeCable = {}; // synchronous version of state (in module + port identify cable, must also identify which head is being moved)
+  const [modules, setModules] = useState({ placing: {}, placed: {} });
+  const [cables, setCables] = useState({ placing: {}, placed: {} });
 
-  // for dragging
+  // for dragging (Can this be not state?)
   let oldXCoord = 0;
   let oldYCoord = 0;
 
+  // or what if you use mouse coords as state?
+
   function addModule(moduleType) {
     setModules((modules) => {
+      modules = { placing: { ...modules.placing }, placed: { ...modules.placed } };
+
       let moduleId;
       do {
         moduleId = Math.floor(Math.random() * 1000) + 1;
       } while (moduleId in modules);
-
       const module = { moduleId, moduleType };
-      modules = { ...modules };
-      modules[moduleId] = module;
 
+      modules.placed[moduleId] = module; // TODO: placing
       return modules;
     });
   }
 
   function removeModule(moduleId) {
     setModules((modules) => {
-      modules = { ...modules };
-      delete modules[moduleId];
+      modules = { placing: { ...modules.placing }, placed: { ...modules.placed } };
 
+      delete modules.placed[moduleId];
+      delete modules.placing[moduleId];
       return modules;
     });
   }
@@ -61,7 +62,14 @@ function Rack() {
     outYCoord
   ) {
     setCables((cables) => {
+      cables = { ...cables, placing: { ...cables.placing } };
+
+      let cableId;
+      do {
+        cableId = Math.floor(Math.random() * 1000) + 1;
+      } while (cableId in cables);
       const cable = {
+        cableId,
         inModuleId,
         inPortId,
         outModuleId,
@@ -72,19 +80,41 @@ function Rack() {
         outYCoord,
       };
 
-      cables = { ...cables };
-      if (!cables[inModuleId]) cables[inModuleId] = {};
-      cables[inModuleId][inPortId] = cable;
-
+      cables.placing[cableId] = cable;
       return cables;
     });
   }
 
-  function updateCable(inModuleId, inPortId, args) {
+  function removeCable(cableId) {
     setCables((cables) => {
-      const cable = { ...cables[inModuleId][inPortId], ...args };
-      cables = { ...cables };
-      cables[inModuleId][inPortId] = cable;
+      cables = { placing: { ...cables.placing }, placed: { ...cables.placed } };
+
+      delete cables.placed[cableId];
+      delete cables.placing[cableId];
+      return cables;
+    });
+  }
+
+  function moveCable(xOffset, yOffset) {
+    setCables((cables) => {
+      cables = { ...cables, placing: { ...cables.placing } };
+
+      for (const cable of Object.values(cables.placing)) {
+        if (!cable.inModuleId) {
+          cables.placing[cable.cableId] = {
+            ...cable,
+            inXCoord: cable.inXCoord + xOffset,
+            inYCoord: cable.inYCoord + yOffset,
+          };
+        }
+        if (!cable.outModuleId) {
+          cables.placing[cable.cableId] = {
+            ...cable,
+            outXCoord: cable.outXCoord + xOffset,
+            outYCoord: cable.outYCoord + yOffset,
+          };
+        }
+      }
 
       return cables;
     });
@@ -100,7 +130,7 @@ function Rack() {
     };
   }, []);
 
-  // CABLES =====
+  // clientX, clientY are relative to viewport while xCoord, yCoord is relative to rack!
 
   function calcRackCoords(element) {
     let xCoord = 0;
@@ -119,39 +149,47 @@ function Rack() {
   }
 
   function handleMouseDown(event) {
-    console.log(event.target);
-    if (event.target.classList.contains("in-port")) {
-      // inport vs. outport
-      const inPort = event.target;
-      // and does not have cable already...
-      // not the most "React" way...
-      let { xCoord, yCoord } = calcRackCoords(inPort.querySelector(".port-icon"));
-      xCoord += inPort.querySelector(".port-icon").offsetWidth / 2;
-      yCoord += inPort.querySelector(".port-icon").offsetHeight / 2;
+    if (event.target.classList.contains("port")) {
+      const port = event.target;
+      const portIcon = port.querySelector(".port-icon");
+      let { xCoord, yCoord } = calcRackCoords(portIcon);
+      xCoord += portIcon.offsetWidth / 2;
+      yCoord += portIcon.offsetHeight / 2;
 
-      const rack = inPort.closest(".rack-inner");
-
-      // TODO: think about whether data-module-id or data-in-module-id makes more sense
-      let { moduleId: inModuleId, inPortId } = inPort.dataset;
-      inModuleId = parseInt(inModuleId);
-      inPortId = parseInt(inPortId);
-      // clientX, clientY are relative to viewport while xCoord, yCoord is relative to rack!
-      addCable(inModuleId, inPortId, null, null, xCoord, yCoord, event.clientX, event.clientY);
-      activeCable = {
-        inModuleId,
-        inPortId,
-        inXCoord: xCoord,
-        inYCoord: yCoord,
-        outXCoord: event.clientX,
-        outYCoord: event.clientY,
-      };
-
-      // actually maybe it's fine to set via state since you're still recording the old coords here
-      rack.onmousemove = handleMouseMove;
-      rack.onmouseup = handleMouseUp;
+      if (port.classList.contains("in-port")) {
+        addCable(
+          parseInt(port.dataset.moduleId),
+          parseInt(port.dataset.inPortId),
+          null,
+          null,
+          xCoord,
+          yCoord,
+          event.clientX,
+          event.clientY
+        );
+      }
+      if (port.classList.contains("out-port")) {
+        setCables((cables) =>
+          addCable(
+            cables,
+            null,
+            null,
+            parseInt(port.dataset.moduleId),
+            parseInt(port.dataset.outPortId),
+            event.clientX,
+            event.clientY,
+            xCoord,
+            yCoord
+          )
+        );
+      }
 
       oldXCoord = event.clientX;
       oldYCoord = event.clientY;
+
+      const rack = port.closest(".rack-inner");
+      rack.onmousemove = handleMouseMove;
+      rack.onmouseup = handleMouseUp;
 
       return;
     }
@@ -171,83 +209,88 @@ function Rack() {
     oldXCoord = newXCoord;
     oldYCoord = newYCoord;
 
-    const { inModuleId, inPortId } = activeCable;
-    // updateCable(inModuleId, inPortId, outXCoord, outYCoord);
-    activeCable.outXCoord += xOffset;
-    activeCable.outYCoord += yOffset;
-
-    setCables((cables) => {
-      const cable = {
-        ...cables[inModuleId][inPortId],
-        outXCoord: activeCable.outXCoord,
-        outYCoord: activeCable.outYCoord,
-      };
-      cables = { ...cables };
-      cables[inModuleId][inPortId] = cable;
-
-      return cables;
-    });
-
-    // if the mouse goes outside the window, cancel
-    // dragging might break when scrolling simultaneously since clientX/Y are relative to viewport
+    moveCable(xOffset, yOffset);
   }
 
   function handleMouseUp(event) {
-    const maybe = document.elementsFromPoint(event.clientX, event.clientY);
-    let inPort = null;
-    for (const element of maybe) {
-      if (element.classList.contains("in-port")) {
-        inPort = element;
+    let port = null;
+
+    const elements = document.elementsFromPoint(event.clientX, event.clientY);
+    for (const element of elements) {
+      if (element.classList.contains("port")) {
+        port = element;
         break;
       }
     }
-    if (inPort) {
-      // and does not have cable already...
-      let { xCoord: outXCoord, yCoord: outYCoord } = calcRackCoords(
-        inPort.querySelector(".port-icon")
-      );
-      outXCoord += inPort.querySelector(".port-icon").offsetWidth / 2;
-      outYCoord += inPort.querySelector(".port-icon").offsetHeight / 2;
 
-      const { inModuleId, inPortId } = activeCable;
-      let { moduleId: outModuleId, inPortId: outPortId } = inPort.dataset; // TODO: outport
-      outModuleId = parseInt(outModuleId);
-      outPortId = parseInt(outPortId);
-      console.log(inModuleId, inPortId, outModuleId, outPortId);
-      updateCable(inModuleId, inPortId, { outModuleId, outPortId, outXCoord, outYCoord });
+    if (port) {
+      const portIcon = port.querySelector(".port-icon");
+      let { xCoord, yCoord } = calcRackCoords(portIcon);
+      xCoord += portIcon.offsetWidth / 2;
+      yCoord += portIcon.offsetHeight / 2;
+
+      setCables((cables) => {
+        cables = { placing: { ...cables.placing }, placed: { ...cables.placed } };
+
+        for (const cable of Object.values(cables.placing)) {
+          if (!cable.inModuleId && port.classList.contains("in-port")) {
+            cables.placed[cable.cableId] = {
+              ...cable,
+              inModuleId: parseInt(port.dataset.moduleId),
+              inPortId: parseInt(port.dataset.inPortId),
+              inXCoord: xCoord,
+              inYCoord: yCoord,
+            };
+          }
+          if (!cable.outModuleId && port.classList.contains("out-port")) {
+            cables.placed[cable.cableId] = {
+              ...cable,
+              outModuleId: parseInt(port.dataset.moduleId),
+              outPortId: parseInt(port.dataset.outPortId),
+              outXCoord: xCoord,
+              outYCoord: yCoord,
+            };
+          }
+        }
+
+        // actually, this has to happen anyway, so either the DOM stuff is put inside here or this line is a separate call
+        cables.placing = {};
+
+        console.log(cables);
+
+        return cables;
+      });
 
       const rack = event.target.closest(".rack-inner");
       rack.onmousemove = null;
       rack.onmouseup = null;
 
       return;
-    } else {
-      // setCables([]);
     }
 
-    // else cancel
+    setCables((cables) => {
+      cables = { ...cables, placing: {} };
+      return cables;
+    });
   }
-
-  // CABLES =====
 
   return (
     <div className="rack-outer">
       <div className="rack-inner" onMouseDown={handleMouseDown}>
-        {Object.values(modules).map((module, i) => {
-          const { moduleId, moduleType } = module;
+        {[...Object.values(modules.placing), ...Object.values(modules.placed)].map((module, i) => {
           const props = {
-            moduleId: moduleId,
+            moduleId: module.moduleId,
             xCoord: 200 * i,
             yCoord: 200,
           };
 
-          switch (moduleType) {
+          switch (module.moduleType) {
             case __TO_DEVICE:
-              return <ToDeviceModule key={moduleId} {...props} />;
+              return <ToDeviceModule key={module.moduleId} {...props} />;
             case __FROM_DEVICE:
               return;
             case __OSCILLATOR:
-              return <OscillatorModule key={moduleId} {...props} />;
+              return <OscillatorModule key={module.moduleId} {...props} />;
             case __ENVELOPE:
               return;
             case __FILTER:
@@ -260,35 +303,22 @@ function Rack() {
               throw new Error("RACK::moduleType is invalid");
           }
         })}
-        {Object.values(cables)
-          .map((cables) =>
-            Object.values(cables).map((cable) => {
-              const {
-                inModuleId,
-                inPortId,
-                outModuleId,
-                outPortId,
-                inXCoord,
-                inYCoord,
-                outXCoord,
-                outYCoord,
-              } = cable;
-              const props = {
-                inModuleId,
-                inPortId,
-                outModuleId,
-                outPortId,
-                inXCoord,
-                inYCoord,
-                outXCoord,
-                outYCoord,
-              };
+        {[...Object.values(cables.placing), ...Object.values(cables.placed)].map((cable) => {
+          const props = {
+            cableId: cable.cableId,
+            inModuleId: cable.inModuleId,
+            inPortId: cable.inPortId,
+            outModuleId: cable.outModuleId,
+            outPortId: cable.outPortId,
+            inXCoord: cable.inXCoord,
+            inYCoord: cable.inYCoord,
+            outXCoord: cable.outXCoord,
+            outYCoord: cable.outYCoord,
+          };
 
-              return <Cable key={inModuleId + " " + inPortId} {...props} />;
-            })
-          )
-          .flat()}
-        <div
+          return <Cable key={cable.cableId} {...props} />;
+        })}
+        {/* <div
           id="red-point"
           style={{
             position: "absolute",
@@ -308,7 +338,7 @@ function Rack() {
               transform: "translate(-50%, -50%)",
             }}
           ></div>
-        </div>
+        </div> */}
       </div>
       <div className="rack-widget">
         <button onClick={() => addModule(__TO_DEVICE)}>TO DEVICE</button>

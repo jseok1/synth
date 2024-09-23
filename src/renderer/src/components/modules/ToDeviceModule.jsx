@@ -1,7 +1,7 @@
-import "../assets/styles/OscillatorModule.css";
+import "../../assets/styles/OscillatorModule.css";
 
 import { useEffect } from "react";
-import { InPort } from "./Port";
+import { InPort } from "../Port";
 
 function ToDeviceModule(props) {
   const { moduleId, xCoord, yCoord } = props;

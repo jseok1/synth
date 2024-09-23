@@ -1,8 +1,8 @@
-import "../assets/styles/OscillatorModule.css";
+import "../../assets/styles/OscillatorModule.css";
 
 import { useEffect, useState } from "react";
-import Slider from "./Slider";
-import { InPort, OutPort } from "./Port";
+import Slider from "../Slider";
+import { InPort, OutPort } from "../Port";
 
 const __FREQ = 0;
 const __FREQ_MOD_AMT = 1;
