@@ -1,9 +1,7 @@
 import { useRef } from "react";
 
-// TODO: (naming) it should either be moduleId, portId or inModuleId, inPortId (but the former makes more sense)
-
 function InPort(props) {
-  const { moduleId, inPortId, label, setCables, calcCoords } = props;
+  const { moduleId, portId, label, setCables, calcCoords } = props;
   const inPortElement = useRef(null);
 
   function handleMouseDown(event) {
@@ -20,7 +18,7 @@ function InPort(props) {
       for (const cable of Object.values(cables)) {
         if (
           cable.inModuleId === moduleId &&
-          cable.inPortId === inPortId &&
+          cable.inPortId === portId &&
           cable.zCoord > maxZCoordLocal
         ) {
           cableId = cable.cableId;
@@ -49,7 +47,7 @@ function InPort(props) {
         cables[cableId] = {
           cableId,
           inModuleId: moduleId,
-          inPortId: inPortId,
+          inPortId: portId,
           outModuleId: null,
           outPortId: null,
           inXCoord: xCoord,
@@ -79,7 +77,7 @@ function InPort(props) {
           cables[cableId] = {
             ...cable,
             inModuleId: moduleId,
-            inPortId: inPortId,
+            inPortId: portId,
             inXCoord: xCoord,
             inYCoord: yCoord,
             inIsDragging: false,
@@ -91,7 +89,6 @@ function InPort(props) {
     });
   }
 
-  // TODO: group into <g>
   return (
     <div className="port in-port" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
       <div className="port-icon" ref={inPortElement}>
@@ -107,7 +104,7 @@ function InPort(props) {
 }
 
 function OutPort(props) {
-  const { moduleId, outPortId, label, setCables, calcCoords } = props;
+  const { moduleId, portId, label, setCables, calcCoords } = props;
   const outPortElement = useRef(null);
 
   function handleMouseDown(event) {
@@ -124,7 +121,7 @@ function OutPort(props) {
       for (const cable of Object.values(cables)) {
         if (
           cable.outModuleId === moduleId &&
-          cable.outPortId === outPortId &&
+          cable.outPortId === portId &&
           cable.zCoord > maxZCoordLocal
         ) {
           cableId = cable.cableId;
@@ -155,7 +152,7 @@ function OutPort(props) {
           inModuleId: null,
           inPortId: null,
           outModuleId: moduleId,
-          outPortId: outPortId,
+          outPortId: portId,
           inXCoord: event.clientX,
           inYCoord: event.clientY,
           outXCoord: xCoord,
@@ -183,7 +180,7 @@ function OutPort(props) {
           cables[cableId] = {
             ...cable,
             outModuleId: moduleId,
-            outPortId: outPortId,
+            outPortId: portId,
             outXCoord: xCoord,
             outYCoord: yCoord,
             outIsDragging: false,
@@ -195,7 +192,6 @@ function OutPort(props) {
     });
   }
 
-  // TODO: group into <g>
   return (
     <div className="port out-port" onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
       <div className="port-icon" ref={outPortElement}>

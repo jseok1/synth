@@ -68,28 +68,28 @@ function OscillatorModule(props) {
           {/* TODO: __IN_PORT_... naming */}
           <InPort
             moduleId={moduleId}
-            inPortId={0}
+            portId={0}
             label="FM"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <InPort
             moduleId={moduleId}
-            inPortId={1}
+            portId={1}
             label="PWM"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <InPort
             moduleId={moduleId}
-            inPortId={2}
+            portId={2}
             label="V/OCT"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <InPort
             moduleId={moduleId}
-            inPortId={3}
+            portId={3}
             label="SYNC"
             setCables={setCables}
             calcCoords={calcCoords}
@@ -100,28 +100,28 @@ function OscillatorModule(props) {
           {/* TODO: __OUT_PORT_... naming */}
           <OutPort
             moduleId={moduleId}
-            outPortId={0}
+            portId={0}
             label="SIN"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <OutPort
             moduleId={moduleId}
-            outPortId={1}
+            portId={1}
             label="TRI"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <OutPort
             moduleId={moduleId}
-            outPortId={2}
+            portId={2}
             label="SAW"
             setCables={setCables}
             calcCoords={calcCoords}
           />
           <OutPort
             moduleId={moduleId}
-            outPortId={3}
+            portId={3}
             label="SQR"
             setCables={setCables}
             calcCoords={calcCoords}

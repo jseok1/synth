@@ -7,13 +7,13 @@
 #include <thread>
 
 #include "Rack.hpp"
-#include "modules/ToDeviceModule.hpp"
-#include "modules/FromDeviceModule.hpp"
-#include "modules/OscillatorModule.hpp"
+#include "modules/AmplifierModule.hpp"
 #include "modules/EnvelopeModule.hpp"
 #include "modules/FilterModule.hpp"
-#include "modules/AmplifierModule.hpp"
+#include "modules/FromDeviceModule.hpp"
 #include "modules/MixerModule.hpp"
+#include "modules/OscillatorModule.hpp"
+#include "modules/ToDeviceModule.hpp"
 
 enum ModuleType : int {
   __TO_DEVICE,
@@ -72,7 +72,6 @@ static int streamCallback(
 void StartStream(const Napi::CallbackInfo &args) {
   // if there's already an audio thread, don't spawn another one
   if () return;
-
 
   auto main = []() {
     PaError err{};
@@ -267,10 +266,6 @@ void RemoveCable(const Napi::CallbackInfo &args) {
   userData.rack.sort_modules();
 }
 
-void Hello(const Napi::CallbackInfo &args) {
-  std::cout << "Hello world" << std::endl;
-}
-
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   // TODO: define functions as lambdas in here with closure context __ out of scope?
 
@@ -281,7 +276,6 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "updateParam"), Napi::Function::New(env, UpdateParam));
   exports.Set(Napi::String::New(env, "addCable"), Napi::Function::New(env, AddCable));
   exports.Set(Napi::String::New(env, "removeCable"), Napi::Function::New(env, RemoveCable));
-  exports.Set(Napi::String::New(env, "hello"), Napi::Function::New(env, Hello));
 
   return exports;
 }

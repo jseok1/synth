@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { InPort } from "../Port";
 
 function ToDeviceModule(props) {
-  const { moduleId, xCoord, yCoord } = props;
+  const { moduleId, xCoord, yCoord, setCables, calcCoords } = props;
 
   useEffect(() => {
     console.log(`api.addModule(moduleId: ${moduleId}, moduleType: __TO_DEVICE);`);
@@ -22,7 +22,13 @@ function ToDeviceModule(props) {
         <div>{moduleId}</div>
 
         <div className="ports">
-          <InPort moduleId={moduleId} inPortId={0} label="AUDIO" />
+          <InPort
+            moduleId={moduleId}
+            portId={0}
+            label="AUDIO"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
         </div>
       </div>
     </div>
