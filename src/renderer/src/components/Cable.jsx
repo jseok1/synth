@@ -1,8 +1,17 @@
 import { useEffect } from "react";
 
 function Cable(props) {
-  const { inModuleId, inPortId, outModuleId, outPortId, inXCoord, inYCoord, outXCoord, outYCoord } =
-    props;
+  const {
+    inModuleId,
+    inPortId,
+    outModuleId,
+    outPortId,
+    inXCoord,
+    inYCoord,
+    outXCoord,
+    outYCoord,
+    zCoord,
+  } = props;
 
   useEffect(() => {
     if (inModuleId !== null && inPortId !== null && outModuleId !== null && outPortId !== null) {
@@ -32,7 +41,7 @@ function Cable(props) {
   // edit <g>
 
   return (
-    <div className="cable">
+    <div className="cable" style={{ zIndex: zCoord }}>
       <svg xmlns="http://www.w3.org/2000/svg">
         <path
           d={`M ${inXCoord} ${inYCoord} C ${inXCoordControl} ${inYCoordControl}, ${outXCoordControl} ${outYCoordControl}, ${outXCoord} ${outYCoord}`}

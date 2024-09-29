@@ -11,7 +11,7 @@ const __PUL_WIDTH_MOD_AMT = 3;
 
 // TODO: will components being run twice lead to problems for C++?
 function OscillatorModule(props) {
-  const { moduleId, xCoord, yCoord } = props;
+  const { moduleId, xCoord, yCoord, setCables, calcCoords } = props;
 
   const params = {};
   const handlers = {};
@@ -30,6 +30,7 @@ function OscillatorModule(props) {
     };
   }, []);
 
+  // is there a way to do this directly with event handlers actually?
   useEffect(() => {
     api.updateParam(moduleId, __FREQ, params[__FREQ]);
   }, [params[__FREQ]]);
@@ -56,6 +57,7 @@ function OscillatorModule(props) {
           max={1000}
           value={params[__FREQ]}
           onChange={(event) => {
+            // actually better if you can use state instead of event.target.value
             handlers[__FREQ](parseFloat(event.target.value));
           }}
         />
@@ -64,18 +66,66 @@ function OscillatorModule(props) {
 
         <div className="ports">
           {/* TODO: __IN_PORT_... naming */}
-          <InPort moduleId={moduleId} inPortId={0} label="FM" />
-          <InPort moduleId={moduleId} inPortId={1} label="PWM" />
-          <InPort moduleId={moduleId} inPortId={2} label="V/OCT" />
-          <InPort moduleId={moduleId} inPortId={3} label="SYNC" />
+          <InPort
+            moduleId={moduleId}
+            inPortId={0}
+            label="FM"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <InPort
+            moduleId={moduleId}
+            inPortId={1}
+            label="PWM"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <InPort
+            moduleId={moduleId}
+            inPortId={2}
+            label="V/OCT"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <InPort
+            moduleId={moduleId}
+            inPortId={3}
+            label="SYNC"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
         </div>
 
         <div className="ports">
           {/* TODO: __OUT_PORT_... naming */}
-          <OutPort moduleId={moduleId} outPortId={0} label="SIN" />
-          <OutPort moduleId={moduleId} outPortId={1} label="TRI" />
-          <OutPort moduleId={moduleId} outPortId={2} label="SAW" />
-          <OutPort moduleId={moduleId} outPortId={3} label="SQR" />
+          <OutPort
+            moduleId={moduleId}
+            outPortId={0}
+            label="SIN"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <OutPort
+            moduleId={moduleId}
+            outPortId={1}
+            label="TRI"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <OutPort
+            moduleId={moduleId}
+            outPortId={2}
+            label="SAW"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
+          <OutPort
+            moduleId={moduleId}
+            outPortId={3}
+            label="SQR"
+            setCables={setCables}
+            calcCoords={calcCoords}
+          />
         </div>
       </div>
     </div>

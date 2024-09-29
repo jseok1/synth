@@ -28,6 +28,8 @@ enum ModuleType : int {
 const double freq_sample = 44100;
 const unsigned long sample_size = 256;
 
+std::thread audio_thread;
+
 struct PaUserData {
   Rack rack;
   bool running;
@@ -68,6 +70,10 @@ static int streamCallback(
 }
 
 void StartStream(const Napi::CallbackInfo &args) {
+  // if there's already an audio thread, don't spawn another one
+  if () return;
+
+
   auto main = []() {
     PaError err{};
 
