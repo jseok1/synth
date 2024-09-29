@@ -12,6 +12,7 @@
 - Change shared_ptr to unique_ptr.
 - Think of a good name.
 - Catenary curves for cables (interesting challenge: model Catenary curves using Bezier).
+- Disallow self cable loops in frontend.
 
 From a variable naming/thinking point of view, inModule vs. outModule is from the context of cables.
 

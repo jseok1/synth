@@ -10,8 +10,6 @@
 #include "modules/FromDeviceModule.hpp"
 #include "modules/ToDeviceModule.hpp"
 
-// ToDevice breaks sometimes
-
 Rack::Rack()
   : sorted_module_ids{}, modules{}, cables{}, from_device_module_id{0}, to_device_module_id{0} {}
 

@@ -28,12 +28,10 @@ enum ModuleType : int {
 const double freq_sample = 44100;
 const unsigned long sample_size = 256;
 
-std::thread audio_thread;
-
 struct PaUserData {
   Rack rack;
-  bool running;
-  long tick;
+  bool is_running = false;
+  long tick = 0;
 } userData;
 
 // could be a lambda
@@ -65,19 +63,19 @@ static int streamCallback(
   data->tick++;
 
   int flag =
-    data->running ? PaStreamCallbackResult::paContinue : PaStreamCallbackResult::paComplete;
+    data->is_running ? PaStreamCallbackResult::paContinue : PaStreamCallbackResult::paComplete;
   return flag;
 }
 
 void StartStream(const Napi::CallbackInfo &args) {
   // if there's already an audio thread, don't spawn another one
-  if () return;
+  if (userData.is_running) return;
+
+  // TODO: need more robust guards --> is a thread created/being created?
+  userData.is_running = true;
 
   auto main = []() {
     PaError err{};
-
-    userData.running = true;
-    userData.tick = 0;
 
     err = Pa_Initialize();
     if (err != paNoError) {
@@ -128,7 +126,7 @@ void StartStream(const Napi::CallbackInfo &args) {
       return;
     }
 
-    std::cout << "Ending stream..." << '\n';
+    std::cout << "Stoping stream..." << '\n';
     err = Pa_CloseStream(stream);
     if (err != paNoError) {
       Pa_Terminate();
@@ -143,7 +141,7 @@ void StartStream(const Napi::CallbackInfo &args) {
 }
 
 void StopStream(const Napi::CallbackInfo &args) {
-  userData.running = false;
+  userData.is_running = false;
 }
 
 // idea: if we want anything to be updated on the GUI, you basically collect

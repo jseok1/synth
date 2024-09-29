@@ -51,14 +51,21 @@ function Rack() {
     });
   }
 
+  // TODO: this is a hack
+  const timeoutId = useRef(null);
   useEffect(() => {
-    // there might be an edge case when starting then immediately stopping the stream
-
-    console.log("api.startStream();");
-    // api.startStream();
+    if (!timeoutId.current) {
+      timeoutId.current = setTimeout(function () {
+        console.log("api.startStream();");
+        api.startStream();
+        timeoutId.current = null;
+      }, 1000);
+    }
     return () => {
-      console.log("api.stopStream();");
-      // api.stopStream();
+      if (!timeoutId.current) {
+        console.log("api.stopStream();");
+        api.stopStream();
+      }
     };
   }, []);
 
