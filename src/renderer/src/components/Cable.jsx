@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 function Cable(props) {
   const {
+    cableId,
     inModuleId,
     inPortId,
     outModuleId,
@@ -40,18 +41,26 @@ function Cable(props) {
   outYCoordControl = inYCoordControl;
   // edit <g>
 
+  const color = [
+    "hsl(40 90% 70%)",
+    "hsl(0 90% 70%)",
+    "hsl(120, 90%, 70%)",
+    "hsl(220, 90%, 70%)",
+    "hsl(300, 90%, 70%)",
+  ][cableId % 5];
+
   return (
     <div className="cable" style={{ zIndex: zCoord }}>
       <svg xmlns="http://www.w3.org/2000/svg">
         <path
           d={`M ${inXCoord} ${inYCoord} C ${inXCoordControl} ${inYCoordControl}, ${outXCoordControl} ${outYCoordControl}, ${outXCoord} ${outYCoord}`}
-          stroke="orange"
+          stroke={color}
           strokeWidth="5"
           fill="none"
           opacity="0.5"
         />
         {/* are there px units? */}
-        <g fill="orange">
+        <g fill={color}>
           <circle cx={inXCoord} cy={inYCoord} r="10" />
           <circle cx={outXCoord} cy={outYCoord} r="10" />
           <g opacity="0.2">

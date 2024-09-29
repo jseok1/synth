@@ -1,5 +1,7 @@
 import { useRef } from "react";
 
+// TODO: (naming) it should either be moduleId, portId or inModuleId, inPortId (but the former makes more sense)
+
 function InPort(props) {
   const { moduleId, inPortId, label, setCables, calcCoords } = props;
   const inPortElement = useRef(null);
@@ -13,11 +15,19 @@ function InPort(props) {
       cables = { ...cables };
 
       let cableId;
-      let zCoord = 0;
+      let maxZCoordLocal = 0; // TODO: maybe better mechanism for z-index that doesn't rely on incrementing unboundedly
+      let maxZCoordGlobal = 0;
       for (const cable of Object.values(cables)) {
-        if (cable.inModuleId === moduleId && cable.inPortId === inPortId && cable.zCoord > zCoord) {
+        if (
+          cable.inModuleId === moduleId &&
+          cable.inPortId === inPortId &&
+          cable.zCoord > maxZCoordLocal
+        ) {
           cableId = cable.cableId;
-          zCoord = cable.zCoord;
+          maxZCoordLocal = cable.zCoord;
+        }
+        if (cable.zCoord > maxZCoordGlobal) {
+          maxZCoordGlobal = cable.zCoord;
         }
       }
 
@@ -29,7 +39,7 @@ function InPort(props) {
           inPortId: null,
           inXCoord: event.clientX,
           inYCoord: event.clientY,
-          zCoord: Math.max(Object.values(cables).map((cable) => cable.zCoord)) + 1,
+          zCoord: maxZCoordGlobal + 1,
           inIsDragging: true,
         };
       } else {
@@ -46,7 +56,7 @@ function InPort(props) {
           inYCoord: yCoord,
           outXCoord: event.clientX,
           outYCoord: event.clientY,
-          zCoord: Math.max(Object.values(cables).map((cable) => cable.zCoord)) + 1,
+          zCoord: maxZCoordGlobal + 1,
           inIsDragging: false,
           outIsDragging: true,
         };
@@ -109,15 +119,19 @@ function OutPort(props) {
       cables = { ...cables };
 
       let cableId;
-      let zCoord = 0;
+      let maxZCoordLocal = 0;
+      let maxZCoordGlobal = 0;
       for (const cable of Object.values(cables)) {
         if (
           cable.outModuleId === moduleId &&
           cable.outPortId === outPortId &&
-          cable.zCoord > zCoord
+          cable.zCoord > maxZCoordLocal
         ) {
           cableId = cable.cableId;
-          zCoord = cable.zCoord;
+          maxZCoordLocal = cable.zCoord;
+        }
+        if (cable.zCoord > maxZCoordGlobal) {
+          maxZCoordGlobal = cable.zCoord;
         }
       }
 
@@ -129,7 +143,7 @@ function OutPort(props) {
           outPortId: null,
           outXCoord: event.clientX,
           outYCoord: event.clientY,
-          zCoord: Math.max(Object.values(cables).map((cable) => cable.zCoord)) + 1,
+          zCoord: maxZCoordGlobal + 1,
           outIsDragging: true,
         };
       } else {
@@ -146,7 +160,7 @@ function OutPort(props) {
           inYCoord: event.clientY,
           outXCoord: xCoord,
           outYCoord: yCoord,
-          zCoord: Math.max(Object.values(cables).map((cable) => cable.zCoord)) + 1,
+          zCoord: maxZCoordGlobal + 1,
           inIsDragging: true,
           outIsDragging: false,
         };
