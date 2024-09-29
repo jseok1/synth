@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import ToDeviceModule from "./modules/ToDeviceModule";
 import OscillatorModule from "./modules/OscillatorModule";
 import Cable from "./Cable";
+import FilterModule from "./modules/FilterModule";
 
 const __TO_DEVICE = 0;
 const __FROM_DEVICE = 1;
@@ -166,7 +167,16 @@ function Rack() {
             case __ENVELOPE:
               return;
             case __FILTER:
-              return;
+              return (
+                <FilterModule
+                  key={module.moduleId}
+                  {...module}
+                  xCoord={200 * i}
+                  yCoord={200}
+                  setCables={setCables}
+                  calcCoords={calcCoords}
+                />
+              );
             case __AMPLIFIER:
               return;
             case __MIXER:
@@ -182,6 +192,7 @@ function Rack() {
       <div className="rack-widget">
         <button onClick={() => addModule(__TO_DEVICE)}>TO DEVICE</button>
         <button onClick={() => addModule(__OSCILLATOR)}>VCO</button>
+        <button onClick={() => addModule(__FILTER)}>VCF</button>
       </div>
     </div>
   );
