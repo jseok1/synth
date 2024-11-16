@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 import ToDeviceModule from "./modules/ToDeviceModule";
 import OscillatorModule from "./modules/OscillatorModule";
-import Cable from "./Cable";
 import FilterModule from "./modules/FilterModule";
+import Cable from "./Cable";
 
 const __TO_DEVICE = 0;
 const __FROM_DEVICE = 1;
@@ -82,6 +82,22 @@ function Rack() {
     cursorCoords.current.xCoord = event.clientX;
     cursorCoords.current.yCoord = event.clientY;
 
+    setModules((modules) => {
+      modules = { ...modules };
+
+      for (const [moduleId, module] of Object.entries(modules)) {
+        if (module.isDragging) {
+          modules[moduleId] = {
+            ...module,
+            xCoord: module.xCoord + xOffset,
+            yCoord: module.yCoord + yOffset,
+          };
+        }
+      }
+
+      return modules;
+    });
+
     setCables((cables) => {
       cables = { ...cables };
 
@@ -107,12 +123,37 @@ function Rack() {
   }
 
   function handleMouseUp(event) {
+    setModules((modules) => {
+      modules = { ...modules };
+
+      for (const [moduleId, module] of Object.entries(modules)) {
+        if (module.isDragging) {
+          modules[moduleId] = { ...module, isDragging: false };
+        }
+      }
+
+      return modules;
+    });
+
     setCables((cables) => {
       cables = { ...cables };
 
       for (const [cableId, cable] of Object.entries(cables)) {
-        if (cable.inIsDragging || cable.outIsDragging) {
-          delete cables[cableId];
+        if (cable.inIsDragging) {
+          // TODO: !== null necessary because of 0 falsy for port IDs
+          if (cable.inModuleId !== null && cable.inPortId !== null) {
+            cables[cableId] = { ...cable, inIsDragging: false };
+          } else {
+            delete cables[cableId];
+          }
+        }
+
+        if (cable.outIsDragging) {
+          if (cable.outModuleId !== null && cable.outPortId !== null) {
+            cables[cableId] = { ...cable, outIsDragging: false };
+          } else {
+            delete cables[cableId];
+          }
         }
       }
 
@@ -145,8 +186,7 @@ function Rack() {
                 <ToDeviceModule
                   key={module.moduleId}
                   {...module}
-                  xCoord={200 * i}
-                  yCoord={200}
+                  setModules={setModules}
                   setCables={setCables}
                   calcCoords={calcCoords}
                 />
@@ -158,8 +198,7 @@ function Rack() {
                 <OscillatorModule
                   key={module.moduleId}
                   {...module}
-                  xCoord={200 * i}
-                  yCoord={200}
+                  setModules={setModules}
                   setCables={setCables}
                   calcCoords={calcCoords}
                 />
@@ -171,8 +210,7 @@ function Rack() {
                 <FilterModule
                   key={module.moduleId}
                   {...module}
-                  xCoord={200 * i}
-                  yCoord={200}
+                  setModules={setModules}
                   setCables={setCables}
                   calcCoords={calcCoords}
                 />

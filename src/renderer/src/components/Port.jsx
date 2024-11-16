@@ -62,6 +62,8 @@ function InPort(props) {
 
       return cables;
     });
+
+    event.stopPropagation();
   }
 
   function handleMouseUp(event) {
@@ -165,6 +167,8 @@ function OutPort(props) {
 
       return cables;
     });
+
+    event.stopPropagation();
   }
 
   function handleMouseUp(event) {
