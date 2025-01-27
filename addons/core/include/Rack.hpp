@@ -8,7 +8,26 @@
 
 #include "modules/Module.hpp"
 
+
+// also TODO, ModuleType, so OscillatorParamType <-- suffix Type
+
+
+struct InPlug {
+  int in_module_id;
+  int in_port_id;
+};
+
+struct OutPlug {
+  int out_module_id;
+  int out_port_id;
+};
+
 struct Cable {
+  // TODO
+  // int in_module_id;
+  // int in_port_id;
+  // int out_module_id;
+  // int out_port_id;
   int module_id;
   int out_port_id;
 };
@@ -42,3 +61,10 @@ class Rack {
 // instead of event handling, frontend should sample status at a determined frequency
 // then this can read it
 // or a rate divided event handler also work if fast enough?
+
+
+// just have:
+// std::unordered_map<int, std::shared_ptr<Module>> modules; --> in_ports --> port_id --> cableId
+// modules[moduleId].inPorts[inPortId].cableId
+//
+// std::unordered_map<int, std::shared_ptr<Module>> cables;

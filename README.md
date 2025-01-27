@@ -13,6 +13,8 @@
 - Think of a good name.
 - Catenary curves for cables (interesting challenge: model Catenary curves using Bezier).
 - Disallow self cable loops in frontend.
+- Quantization module
+- Drag to scroll
 
 From a variable naming/thinking point of view, inModule vs. outModule is from the context of cables.
 
@@ -33,7 +35,7 @@ https://www.youtube.com/watch?v=PoZAo2Vikbo
 https://stackoverflow.com/questions/23214614/time-between-callback-calls/23226247#23226247
 https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
 
-## Graph Structure
+## Graph Structure & Topological Sort
 
 Modules and ports with cables form a DAG.
 Modules may have multiple edges going to another module.
@@ -42,6 +44,11 @@ Output ports may have more than one cable.
 A topological sort of a DAG is the reversed topological sort of the reversed DAG. Therefore, cables can be represented as directed edges from input ports to output ports.
 Modules are vertices. Ports identify edges. There may be multiple edges from one vertex to another.
 There can be multiple source vertices but only one destination vertex.
+
+## Interval Sorting
+
+The drag & drop functionality works by sorting modules by their top-left position. This is like
+interval sorting. 
 
 ## React notes
 

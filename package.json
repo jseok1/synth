@@ -5,25 +5,33 @@
   "main": "./out/main/index.js",
   "author": "https://github.com/jseok1",
   "scripts": {
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
+    "typecheck": "npm run typecheck:node && npm run svelte-check",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "build": "npm run typecheck && electron-vite build",
     "compile:debug": "cmake-js compile --config Debug --directory ./addons/core --out ./addons/core/build && copyfiles --flat ./addons/core/build/Debug/core.node ./resources",
     "compile:release": "cmake-js compile --config Release --directory ./addons/core --out ./addons/core/build && copyfiles --flat ./addons/core/build/Release/core.node ./resources"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
-    "@electron-toolkit/utils": "^3.0.0"
+    "@electron-toolkit/utils": "^3.0.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@types/node": "^22.10.5",
     "cmake-js": "^7.3.0",
     "copyfiles": "^2.4.1",
     "electron": "^31.0.2",
     "electron-vite": "^2.3.0",
     "node-addon-api": "^8.1.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "svelte": "^5.19.0",
+    "svelte-check": "^4.1.4",
+    "tslib": "^2.6.3",
+    "typescript": "^5.7.3",
     "vite": "^5.3.1"
   }
 }
