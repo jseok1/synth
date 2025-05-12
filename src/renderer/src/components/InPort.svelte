@@ -12,7 +12,7 @@
     dragOutPlug,
     connectInPlugToInPort,
     disconnectInPlugFromInPort,
-  } = getContext("rack");
+  } = getContext("context.api");
 
   function handleMouseDown(event: MouseEvent): void {
     const { xCoord, yCoord } = calcCoords(inPortElement);

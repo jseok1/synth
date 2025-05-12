@@ -1,9 +1,13 @@
-#ifndef PORT_HPP
-#define PORT_HPP
+#pragma once
+
+enum IO {
+  __IN,
+  __OUT
+}
 
 struct InPort {
   double volt;
-  bool is_connected; // or replace with cable-id
+  bool is_connected;  // or replace with cable-id
 };
 
 struct OutPort {
@@ -11,4 +15,5 @@ struct OutPort {
   // list of cable ids
 };
 
-#endif
+// union of enums possible in C++?
+

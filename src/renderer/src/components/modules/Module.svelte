@@ -3,7 +3,7 @@
 
   let { module, children } = $props();
 
-  const { dragModule } = getContext("rack");
+  const { dragModule } = getContext("context.api");
 
   function handleMouseDown(event: MouseEvent): void {
     dragModule(module.moduleId, module.xCoord, module.yCoord, false);

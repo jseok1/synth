@@ -1,35 +1,9 @@
-<script lang="ts" module>
-  export function addOscillatorModule(moduleId: string): Module {
-    return {
-      moduleId,
-      moduleType: ModuleType.__OSCILLATOR,
-      inPorts: {
-        [OscillatorInPortType.__FREQ_MOD]: { cableId: null },
-        [OscillatorInPortType.__PUL_WIDTH_MOD]: { cableId: null },
-        [OscillatorInPortType.__VOLT_PER_OCT]: { cableId: null },
-        [OscillatorInPortType.__SYNC]: { cableId: null },
-      },
-      outPorts: {
-        [OscillatorOutPortType.__SIN]: { cableIds: [] },
-        [OscillatorOutPortType.__TRI]: { cableIds: [] },
-        [OscillatorOutPortType.__SAW]: { cableIds: [] },
-        [OscillatorOutPortType.__SQR]: { cableIds: [] },
-        [OscillatorOutPortType.__PUL]: { cableIds: [] },
-      },
-      xCoord: 0,
-      yCoord: 0,
-      isDropped: true,
-      width: 50 * 4,
-      height: 50 * 8,
-    };
-  }
-</script>
-
 <script lang="ts">
   import Module from "./Module.svelte";
   import InPort from "../InPort.svelte";
   import OutPort from "../OutPort.svelte";
   import Knob from "../Knob.svelte";
+  import { getContext } from "svelte";
 
   let { module, cables } = $props();
 

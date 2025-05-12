@@ -8,11 +8,12 @@
   const {
     calcCoords,
     addCable,
-    dragInPlug,
-    dragOutPlug,
+    moveHandle,
+    selectHandle,
+    deselectHandle,
     connectOutPlugToOutPort,
     disconnectOutPlugFromOutPort,
-  } = getContext("rack");
+  } = getContext("context.api");
 
   function handleMouseDown(event: MouseEvent): void {
     const { xCoord, yCoord } = calcCoords(outPortElement);
@@ -20,12 +21,14 @@
     let cableId = module.outPorts[outPortId].cableIds.at(-1);
     if (cableId) {
       disconnectOutPlugFromOutPort(cableId);
-      dragOutPlug(cableId, event.clientX, event.clientY, false);
+      selectHandle(cables[cableId].outPlug.handleId);
+      moveHandle(cables[cableId].outPlug.handleId, event.clientX, event.clientY);
     } else {
       cableId = addCable();
       connectOutPlugToOutPort(cableId, module.moduleId, outPortId);
-      dragInPlug(cableId, event.clientX, event.clientY, false);
-      dragOutPlug(cableId, xCoord, yCoord, true);
+      selectHandle(cables[cableId].inPlug.handleId);
+      moveHandle(cables[cableId].inPlug.handleId, event.clientX, event.clientY);
+      moveHandle(cables[cableId].outPlug.handleId, xCoord, yCoord);
     }
 
     event.stopPropagation();
@@ -34,12 +37,9 @@
   function handleMouseUp(event: MouseEvent): void {
     const { xCoord, yCoord } = calcCoords(outPortElement);
 
-    for (const [cableId, cable] of Object.entries(cables)) {
-      if (!cable.outPlug.isDropped) {
-        connectOutPlugToOutPort(cableId, module.moduleId, outPortId);
-        dragOutPlug(cableId, xCoord, yCoord, true);
-      }
-    }
+
+    connectOutPlugToOutPort(cableId, module.moduleId, outPortId);
+    moveHandle(selected, xCoord, yCoord);
   }
 </script>
 

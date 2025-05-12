@@ -7,10 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(core LANGUAGES CXX C)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_definitions(-DNAPI_VERSION=4)
 add_compile_definitions(_USE_MATH_DEFINES)
 
-include_directories(${CMAKE_JS_INC})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC})
 
 file(GLOB_RECURSE PROJECT_SOURCE src/*.cpp src/*.c)
 
@@ -18,11 +20,11 @@ add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE} ${CMAKE_JS_SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
 
-include_directories(include)
-include_directories(lib/portaudio/include)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE lib/portaudio/include)
 
 add_subdirectory(lib/portaudio)
-target_link_libraries(${PROJECT_NAME} portaudio_static)
+target_link_libraries(${PROJECT_NAME} PRIVATE portaudio_static)
 
 # Include N-API wrappers
 execute_process(COMMAND node -p "require('node-addon-api').include"

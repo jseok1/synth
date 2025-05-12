@@ -1,10 +1,9 @@
 <script lang="ts">
   import { setContext } from "svelte";
   import Cable from "./Cable.svelte";
-  import OscillatorModule, { addOscillatorModule } from "./modules/OscillatorModule.svelte";
+  import OscillatorModule from "./modules/OscillatorModule.svelte";
 
   import { v4 as uuid } from "uuid";
-  import Module from "./modules/Module.svelte";
 
   const Modules = {
     [ModuleType.__TO_DEVICE]: OscillatorModule,
@@ -21,8 +20,19 @@
     height: 50 * 8,
   } as const;
 
-  const { modules, cables } = $state<Rack>({ modules: {}, cables: {} });
-  const cursorCoords = { xCoord: 0, yCoord: 0 };
+  const dimensions = {
+    [ModuleType.__TO_DEVICE]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__FROM_DEVICE]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__OSCILLATOR]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__ENVELOPE]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__FILTER]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__AMPLIFIER]: { width: unit.width * 4, height: unit.height },
+    [ModuleType.__MIXER]: { width: unit.width * 4, height: unit.height },
+  };
+
+  let { modules, cables } = $state<Rack>({ modules: {}, cables: {} });
+    let onMouseMove: ((xOffset: number, yOffset; number) => void) | null = null;
+    let onMouseUp: ((xOffset: number, yOffset; number) => void) | null = null;
 
   let rackElement: HTMLElement;
 
@@ -42,6 +52,27 @@
     return { xCoord, yCoord };
   }
 
+  function addOscillatorModule(moduleId: string): Module {
+    return {
+      moduleId,
+      moduleType: ModuleType.__OSCILLATOR,
+      inPorts: {
+        [OscillatorInPortType.__FREQ_MOD]: { cableId: null },
+        [OscillatorInPortType.__PUL_WIDTH_MOD]: { cableId: null },
+        [OscillatorInPortType.__VOLT_PER_OCT]: { cableId: null },
+        [OscillatorInPortType.__SYNC]: { cableId: null },
+      },
+      outPorts: {
+        [OscillatorOutPortType.__SIN]: { cableIds: [] },
+        [OscillatorOutPortType.__TRI]: { cableIds: [] },
+        [OscillatorOutPortType.__SAW]: { cableIds: [] },
+        [OscillatorOutPortType.__SQR]: { cableIds: [] },
+        [OscillatorOutPortType.__PUL]: { cableIds: [] },
+      },
+      handleId: addHandle(),
+    };
+  }
+
   function addModule(moduleType: ModuleType): string {
     let moduleId: string;
     do {
@@ -49,14 +80,14 @@
     } while (moduleId in modules);
 
     modules[moduleId] = {
-      [ModuleType.__TO_DEVICE]: addOscillatorModule(moduleId),
-      [ModuleType.__FROM_DEVICE]: addOscillatorModule(moduleId),
-      [ModuleType.__OSCILLATOR]: addOscillatorModule(moduleId),
-      [ModuleType.__ENVELOPE]: addOscillatorModule(moduleId),
-      [ModuleType.__FILTER]: addOscillatorModule(moduleId),
-      [ModuleType.__AMPLIFIER]: addOscillatorModule(moduleId),
-      [ModuleType.__MIXER]: addOscillatorModule(moduleId),
-    }[moduleType];
+      [ModuleType.__TO_DEVICE]: addOscillatorModule,
+      [ModuleType.__FROM_DEVICE]: addOscillatorModule,
+      [ModuleType.__OSCILLATOR]: addOscillatorModule,
+      [ModuleType.__ENVELOPE]: addOscillatorModule,
+      [ModuleType.__FILTER]: addOscillatorModule,
+      [ModuleType.__AMPLIFIER]: addOscillatorModule,
+      [ModuleType.__MIXER]: addOscillatorModule,
+    }[moduleType](moduleId);
 
     return moduleId;
   }
@@ -74,37 +105,9 @@
       }
     }
 
+    removeHandle(module.handleId);
+
     delete modules[moduleId];
-  }
-
-  function dragModule(moduleId: string, xCoord: number, yCoord: number, drop: boolean): void {
-    const module = modules[moduleId];
-
-    const xOffset = xCoord - module.xCoord;
-    const yOffset = yCoord - module.yCoord;
-
-    module.xCoord = xCoord;
-    module.yCoord = yCoord;
-    module.isDropped = drop;
-
-    for (const inPort of Object.values(module.inPorts)) {
-      if (inPort.cableId) {
-        const cable = cables[inPort.cableId];
-        dragInPlug(
-          inPort.cableId,
-          cable.inPlug.xCoord + xOffset,
-          cable.inPlug.yCoord + yOffset,
-          drop,
-        );
-      }
-    }
-
-    for (const outPort of Object.values(module.outPorts)) {
-      for (const cableId of outPort.cableIds) {
-        const cable = cables[cableId];
-        dragOutPlug(cableId, cable.outPlug.xCoord + xOffset, cable.outPlug.yCoord + yOffset, drop);
-      }
-    }
   }
 
   function addCable(): string {
@@ -118,16 +121,12 @@
       inPlug: {
         moduleId: null,
         inPortId: null,
-        xCoord: 0,
-        yCoord: 0,
-        isDropped: true,
+        handleId: addHandle(),
       },
       outPlug: {
         moduleId: null,
         outPortId: null,
-        xCoord: 0,
-        yCoord: 0,
-        isDropped: true,
+        handleId: addHandle(),
       },
       zCoord: 0,
       color: [
@@ -153,30 +152,17 @@
       disconnectOutPlugFromOutPort(cableId);
     }
 
+    removeHandle(cable.inPlug.handleId);
+    removeHandle(cable.outPlug.handleId);
+
     delete cables[cableId];
-  }
-
-  function dragInPlug(cableId: string, xCoord: number, yCoord: number, drop: boolean): void {
-    const cable = cables[cableId];
-
-    cable.inPlug.xCoord = xCoord;
-    cable.inPlug.yCoord = yCoord;
-    cable.inPlug.isDropped = drop;
-  }
-
-  function dragOutPlug(cableId: string, xCoord: number, yCoord: number, drop: boolean): void {
-    const cable = cables[cableId];
-
-    cable.outPlug.xCoord = xCoord;
-    cable.outPlug.yCoord = yCoord;
-    cable.outPlug.isDropped = drop;
   }
 
   function connectInPlugToInPort(cableId: string, moduleId: string, inPortId: string): void {
     const cable = cables[cableId];
+    const module = modules[moduleId];
 
-    const inPort = modules[moduleId].inPorts[inPortId];
-    inPort.cableId = cableId;
+    module.inPorts[inPortId].cableId = cableId;
 
     cable.inPlug.moduleId = moduleId;
     cable.inPlug.inPortId = inPortId;
@@ -184,9 +170,9 @@
 
   function disconnectInPlugFromInPort(cableId: string): void {
     const cable = cables[cableId];
+    const module = modules[cable.inPlug.moduleId];
 
-    const inPort = modules[cable.inPlug.moduleId].inPorts[cable.inPlug.inPortId];
-    inPort.cableId = null;
+    module.inPorts[cable.inPlug.inPortId].cableId = null;
 
     cable.inPlug.moduleId = null;
     cable.inPlug.inPortId = null;
@@ -194,9 +180,9 @@
 
   function connectOutPlugToOutPort(cableId: string, moduleId: string, outPortId: string): void {
     const cable = cables[cableId];
+    const module = modules[moduleId];
 
-    const outPort = modules[moduleId].outPorts[outPortId];
-    outPort.cableIds.push(cableId);
+    module.outPorts[outPortId].cableIds.push(cableId);
 
     cable.outPlug.moduleId = moduleId;
     cable.outPlug.outPortId = outPortId;
@@ -204,166 +190,221 @@
 
   function disconnectOutPlugFromOutPort(cableId: string): void {
     const cable = cables[cableId];
+    const module = modules[cable.outPlug.moduleId];
 
-    const outPort = modules[cable.outPlug.moduleId].outPorts[cable.outPlug.outPortId];
-    outPort.cableIds = outPort.cableIds.filter(
-      (cableId: string): boolean => cableId !== cable.cableId, // cable.cableId
-    );
+    module.outPorts[cable.outPlug.outPortId].cableIds = module.outPorts[
+      cable.outPlug.outPortId
+    ].cableIds.filter((cableId: string): boolean => cableId !== cable.cableId);
 
     cable.outPlug.moduleId = null;
     cable.outPlug.outPortId = null;
   }
 
-  setContext("rack", {
+  function addHandle(handleId: string): void {
+    handles[handleId] = {
+      handleId,
+      xCoord: 0,
+      yCoord: 0,
+    };
+  }
+
+  function removeHandle(handleId: string): void {
+    delete handles[handleId];
+  }
+
+  function moveHandle(handleId: string, xCoord: number, yCoord: number): void {
+    const handle = handles[handleId];
+
+    const deltaXCoord = xCoord - handle.xCoord;
+    const deltaYCoord = yCoord - handle.yCoord;
+
+    handle.xCoord = xCoord;
+    handle.yCoord = yCoord;
+
+    for (const child of handle.children) {
+      moveHandle(child, handles[child].xCoord + deltaXCoord, handles[child].yCoord + deltaYCoord);
+    }
+  }
+
+  function selectHandle(handleId: string) {
+    const handle = handles[mouse.handleId];
+    handle.children.push(handleId);
+  }
+
+  function deselectHandle(handleId: string) {
+    const handle = handles[mouse.handleId];
+    handle.children = handle.children.filter((child) => child !== handleId);
+  }
+
+  setContext("addHandle", {
     calcCoords,
     addModule,
     removeModule,
-    dragModule,
     addCable,
     removeCable,
-    dragInPlug,
-    dragOutPlug,
     connectInPlugToInPort,
     disconnectInPlugFromInPort,
     connectOutPlugToOutPort,
     disconnectOutPlugFromOutPort,
+    updateTransform,
+    selectTransform,
+    deselectTransform
   });
+  // module::4741f751-6220-46a1-91b5-da0727d8375d
+  // cable::4741f751-6220-46a1-91b5-da0727d8375d::in-plug
+  // cable::4741f751-6220-46a1-91b5-da0727d8375d::out-plug
 
-  function handleMouseMove(event: MouseEvent): void {
-    const xOffset = event.clientX - cursorCoords.xCoord;
-    const yOffset = event.clientY - cursorCoords.yCoord;
 
-    cursorCoords.xCoord = event.clientX;
-    cursorCoords.yCoord = event.clientY;
+  function addTransform() {
 
-    for (const [moduleId, module] of Object.entries(modules)) {
-      if (!module.isDropped) {
-        dragModule(moduleId, module.xCoord + xOffset, module.yCoord + yOffset, false);
-        return; // idk about this
+  }
+
+  function removeTransform() {
+
+  }
+
+  function updateTransform() {
+
+  }
+
+  function selectTransform() {
+
+  }
+  
+  function deselectTransform() {
+
+  }
+
+  // idea: there's a border around the rack where if you drop modules there, they are deleted
+
+  // JS
+  // modules, inPlugs, outPlugs
+  // use $derived rune to keep a reference to floating plugs/module (any inPlugs without inPorts, outPlugs without outPorts)
+  // 
+  // calcCoords(element: HTMLElement),
+
+  // addModule(moduleType: ModuleType),
+  // removeModule(moduleId: string),
+  // addCable,
+  // removeCable,
+  // connectInPlugToInPort,
+  // disconnectInPlugFromInPort,
+  // connectOutPlugToOutPort,
+  // disconnectOutPlugFromOutPort,
+  // 
+  //
+  // Separate handles object that references modules/cables via URN. This is the fake polymorphism part.
+  // This also decouples entities from drawing logic.
+  // addHandle(handleId: string)
+  // removeHandle()
+  // moveHandle()
+  // selectHandle()
+  // deselectHandle()
+  //
+  // handles have Trans?
+  //
+  // what the fuck is this abstraction hell
+
+
+  // JS
+  // module -> inPort -> inPlug <-> outPlug <- outPort <- module
+  //                     (     cable      )
+  // C++
+  // module -> inPort <----------------------> outPort <- module  (storing outPortId in inPort also tells you whether this port is connected or not)
+
+
+
+
+
+
+  // alt, keeping a list of handle to move is easy
+  (xOffset: number, yOffset: number, isValid: boolean) => {
+    moveHandle(module.handleId, xOffset, yOffset);
+
+    for (const inPort of Object.values(module.inPorts)) {
+      const cable = cables[inPort.cableId];
+      moveHandle(cable.inPlug.handleId, xOffset, yOffset);
+    }
+
+    for (const outPort of Object.values(module.outPorts)) {
+      for (const cableId of outPort.cableIds) {
+        const cable = cables[cableId];
+        moveHandle(cable.outPlug.handleId, xOffset, yOffset);
       }
+    }
+  };
+
+  () => {
+    for (const module of Object.values(modules)) {
+      const handle = handles[module.handleId];
+      moveHandle(
+        module.handleId,
+        Math.max(0, Math.round(handle.xCoord / unit.width) * unit.width),
+        Math.max(0, Math.round(handle.yCoord / unit.height) * unit.height),
+      );
+    }
+
+    const sorted = Object.values(modules).sort((firstModule, secondModule) => {
+      const firstHandle = handles[firstModule.handleId];
+      const secondHandle = handles[secondModule.handleId];
+
+      return firstHandle.yCoord - secondHandle.yCoord || firstHandle.xCoord - secondHandle.xCoord;
+    });
+
+    let xCoord = 0;
+    let yCoord = 0;
+    for (const module of sorted) {
+      const handle = handles[module.handleId];
+
+      if (handle.yCoord !== yCoord) {
+        xCoord = handle.xCoord;
+        yCoord = handle.yCoord;
+      }
+
+      if (handle.xCoord < xCoord) {
+        moveHandle(module.handleId, xCoord, handle.yCoord);
+      }
+      xCoord = handle.xCoord + dimensions[module.moduleType].width;
     }
 
     for (const [cableId, cable] of Object.entries(cables)) {
-      if (!cable.inPlug.isDropped) {
-        dragInPlug(cableId, cable.inPlug.xCoord + xOffset, cable.inPlug.yCoord + yOffset, false);
+      if (!cable.inPlug.moduleId && !cable.inPlug.inPortId) {
+        removeCable(cableId);
       }
 
-      if (!cable.outPlug.isDropped) {
-        dragOutPlug(cableId, cable.outPlug.xCoord + xOffset, cable.outPlug.yCoord + yOffset, false);
+      if (!cable.outPlug.moduleId && !cable.outPlug.outPortId) {
+        removeCable(cableId);
       }
     }
+  };
+
+  // if moved on top of port and deselected -> connect
+  // else -> disconnect
+
+  // PRINCIPLE: things are based on the position and selected/deselected status of PLUGS
+  // PRINCIPLE: only ONE thing is selected at a given time (plug or module)
+  // therefore, fire a "update state" callback on mouse move, down, up
+  // but ONLY check components that might change -> register/deregister components as necessary
+  // handles are things that are movable
+
+  // a big headache was that I didn't want enums to track whether the selected object was a module or cable
+  // at the time of onmousedown, you could attach global callbacks to play onmousemove and onmousedown
+  // could attach state entirely within these callbacks?
+
+  // register callbacks in array and call each
+
+  function handleMouseMove(event: MouseEvent): void {
+    if (!onMouseMove) return;
+    // moveHandle(mouse.handleId, event.clientX, event.clientY);
+    onMouseMove(event.clientX, event.clientY);
   }
 
   function handleMouseUp(event: MouseEvent): void {
-    for (const [moduleId, module] of Object.entries(modules)) {
-      if (!module.isDropped) {
-        dragModule(
-          moduleId,
-          Math.max(0, Math.round(module.xCoord / unit.width) * unit.width),
-          Math.max(0, Math.round(module.yCoord / unit.height) * unit.height),
-          true,
-        );
-      }
-    }
-
-    const yCoords = Object.groupBy(
-      Object.values(modules),
-      (module: Module): number => module.yCoord,
-    );
-    for (const group of Object.values(yCoords)) {
-      group.sort((thisModule, thatModule) => thisModule.xCoord - thatModule.xCoord);
-      // is there a different algo?
-
-      let xCoord = 0;
-      for (const module of group) {
-        if (module.xCoord < xCoord) {
-          dragModule(module.moduleId, xCoord, module.yCoord, true);
-        }
-        xCoord = module.xCoord + module.width;
-      }
-    }
-
-    for (const [cableId, cable] of Object.entries(cables)) {
-      if (!cable.inPlug.isDropped) {
-        removeCable(cableId);
-      }
-
-      if (!cable.outPlug.isDropped) {
-        removeCable(cableId);
-      }
-    }
+    if (!onMouseUp) return;
+    onMouseUp(event.clientX, event.clientY);
+    onMouseUp = null;
   }
 </script>
-
-<!-- 
-    calcCoords,
-    addModule,
-    removeModule,
-    addCable,
-    removeCable,
-    connectInPlugToInPort,
-    disconnectInPlugFromInPort,
-    connectOutPlugToOutPort,
-    disconnectOutPlugFromOutPort,
-    moveHandle,
-    selectHandle,
-    deselectHandle
-
-{ selected, modules, cables }
-
-
-interface InPort {
-  cableId: string | null;
-}
-
-interface OutPort {
-  cableIds: string[];
-}
-
-interface Module {
-  moduleId: string;
-  moduleType: ModuleType;
-  inPorts: {
-    [inPortId: string]: InPort;
-  };
-  outPorts: {
-    [outPortId: string]: OutPort;
-  };
-  handleId: string;
-}
-^ technically ports aren't necessary unless you want to change state in the module based on connectedness
-(which maybe?)
-
-interface InPlug {
-  moduleId: string | null;
-  inPortId: string | null;
-  handleId: string;
-}
-
-interface OutPlug {
-  moduleId: string | null;
-  outPortId: string | null;
-  handleId: string;
-}
-
-interface Cable {
-  cableId: string;
-  inPlug: InPlug;
-  outPlug: OutPlug;
-  zCoord: number;
-  color: string;
-}
-
-/** this decouples state vs position */
-interface Handle {
-  handleId: string;
-  xCoord: number;
-  yCoord: number;
-  dependencies: number[];
-}
-
-
--->
 
 <div class="rack-outer">
   <!-- svelte-ignore a11y_no_static_element_interactions -->

@@ -30,6 +30,11 @@ enum OscillatorOutPortType {
   __PUL,
 }
 
+interface Transform {
+  xCoord: number;
+  yCoord: number;
+}
+
 interface InPort {
   cableId: string | null;
 }
@@ -47,25 +52,19 @@ interface Module {
   outPorts: {
     [outPortId: string]: OutPort;
   };
-  xCoord: number;
-  yCoord: number;
-  isDropped: boolean;
+  transform: Transform;
 }
 
 interface InPlug {
-  moduleId: string | null;
-  inPortId: string | null;
-  xCoord: number;
-  yCoord: number;
-  isDropped: boolean;
+  moduleId: string;
+  inPortId: string;
+  transform: Transform;
 }
 
 interface OutPlug {
-  moduleId: string | null;
-  outPortId: string | null;
-  xCoord: number;
-  yCoord: number;
-  isDropped: boolean;
+  moduleId: string;
+  outPortId: string;
+  transform: Transform;
 }
 
 interface Cable {
@@ -73,14 +72,18 @@ interface Cable {
   inPlug: InPlug;
   outPlug: OutPlug;
   zCoord: number;
-  color: string; // better type for this? maybe use a color enum of possible values
+}
+
+interface Modules {
+  [moduleId: string]: Module;
+}
+
+interface Cables {
+  [cableId: string]: Cable;
 }
 
 interface Rack {
-  modules: {
-    [moduleId: string]: Module;
-  };
-  cables: {
-    [cableId: string]: Cable;
-  };
+  modules: Modules;
+  cables: Cables;
+  selected: { transformId: string };
 }
